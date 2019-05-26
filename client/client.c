@@ -1,41 +1,40 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <unistd.h>
-#define MAX 80 
-#define PORT 8080 
-#define SA struct sockaddr 
+#define MAX 80
+#define PORT 8080
+#define SA struct sockaddr
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "board_library.h"
 #include "UI_library.h"
 
 int main(){
 
 	//Create session with the server
-	int sockfd, connfd; 
-    struct sockaddr_in servaddr, cli; 
-  
-    // socket create and varification 
-    sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-    if (sockfd == -1) { 
-        printf("socket creation failed...\n"); 
-        exit(0); 
-    } 
+	int sockfd, connfd;
+    struct sockaddr_in servaddr, cli;
+
+    // socket create and varification
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        printf("socket creation failed...\n");
+        exit(0);
+    }
     else
-        printf("Socket successfully created..\n"); 
-    bzero(&servaddr, sizeof(servaddr)); 
-  
-    // assign IP, PORT 
-    servaddr.sin_family = AF_INET; 
-    servaddr.sin_addr.s_addr = inet_addr("194.210.227.85"); 
-    servaddr.sin_port = htons(PORT); 
-  
-    // connect the client socket to server socket 
-    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) { 
-        printf("connection with the server failed...\n"); 
-        exit(0); 
-    } 
+        printf("Socket successfully created..\n");
+    bzero(&servaddr, sizeof(servaddr));
+
+    // assign IP, PORT
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr("194.210.227.85");
+    servaddr.sin_port = htons(PORT);
+
+    // connect the client socket to server socket
+    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
+        printf("connection with the server failed...\n");
+        exit(0);
+    }
     else
         printf("connected to the server..\n");
 
@@ -62,25 +61,25 @@ int main(){
 				}
 				case SDL_MOUSEBUTTONDOWN:{
 					printf("click (%d %d)\n", event.button.x, event.button.y);
-					
+
 					//TO DO: funcao que comunica a jogada para o servidor
 					char buff[MAX];
-					bzero(buff, MAX); 
+					bzero(buff, MAX);
 					sprintf(buff, "(%d,%d)", event.button.x, event.button.y);
-					write(sockfd, buff, sizeof(buff)); 
-					
-					bzero(buff, MAX); 
+					write(sockfd, buff, sizeof(buff));
+
+					bzero(buff, MAX);
 					read(sockfd, buff, sizeof(buff));
 					printf("%s\n", buff);
 					exit(0);
-					
+
 					int code, board_x, board_y, aux_x, aux_y;
 					char aux[3], aux1[3];
 					aux[2] = '\0';
 					aux1[2] = '\0';
 					sscanf(buff, "%d,%d,%d,%s", &code, &board_x, &board_y, aux);
 					printf("jogada (%d,%d,%d,%s)", code, board_x, board_y, aux);
-					
+
 					//Actualizes the board
 					switch (code) {
 						case 1:

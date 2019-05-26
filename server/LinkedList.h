@@ -68,32 +68,11 @@ typedef void * Item;
  ******************************************************************************/
 typedef struct LinkedListStruct
 {
-  int nplayers;
+  int player_number;
   int color[3];
   int socket;
-  Item this;
   struct LinkedListStruct *next;
 }PlayerList;
-
-
-
-
-/******************************************************************************
- *  Function:
- *    initLinkedList
- *
- *  Description:
- *    Initializes a new linked list.
- *
- *  Arguments:
- *    None
- *
- *  Return value:
- *    Returns the pointer to a new linked list.
- ******************************************************************************/
-PlayerList* initLinkedList(void);
-
-
 
 /******************************************************************************
  *  Function:
@@ -153,22 +132,7 @@ PlayerList* getNextNodeLinkedList(PlayerList* node);
 
 
 
-/******************************************************************************
- *  Function:
- *    getItemLinkedList
- *
- *  Description:
- *    Gets the item of a linked list node.
- *
- *  Arguments:
- *    Pointer to a linked list node:
- *        (PlayerList*) node
- *
- *  Return value:
- *    Returns the pointer to the item of a linked list node. NULL
- *   is returned if the node is NULL (or if the item is NULL).
- ******************************************************************************/
-Item getItemLinkedList(PlayerList* node);
+
 
 
 
@@ -190,43 +154,7 @@ Item getItemLinkedList(PlayerList* node);
  ******************************************************************************/
 //PlayerList* insertUnsortedLinkedList(PlayerList* next, Item this);
 
-PlayerList* insertLastLinkedList(PlayerList* head, Item this);
-
-
-
-/******************************************************************************
- *  Function:
- *    InsertSortedLinkedList
- *
- *  Description:
- *    Inserts an item in order in an sorted linked list.
- *
- *  Arguments:
- *    Pointer to the first node of a sorted linked list:
- *        (PlayerList*) first
- *    Pointer to item to be inserted:
- *        Item item
- *    Pointer to function to compare two items:
- *        int comparisonItemFnt(void * item1, void * item2)
- *
- *        This function returns a value less, equal, or greater
- *       than zero if item1 compares less, equal, or greater than
- *       item2, respectively.
- *
- *    Pointer to integer to write error return value:
- *        (int *) err
- *
- *        0 upon sucess, 1 in case the item is NULL, and 2 in
- *   case of memory allocation failure.
- *
- *  Return value:
- *    Returns the pointer to the first node of the sorted linked list.
- ******************************************************************************/
-PlayerList* insertSortedLinkedList(PlayerList * first,
-                           Item item,
-                           int (* comparisonItemFnt)
-                           (Item item1, Item item2),
-                           int * err);
+PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_number /*,int *colors*/);
 
 
 

@@ -42,23 +42,22 @@ int main(){
 
   while(1)
   {
-      //Accept call creates a new socket for the incoming connection
-      addr_size = sizeof serverStorage;
-      newSocket = accept(serverSocket, (struct sockaddr *) &serverStorage, &addr_size);
-      //for each client request creates a thread and assign the client request to it to process
-     //so the main thread can entertain next request
+    //Accept call creates a new socket for the incoming connection
+    addr_size = sizeof serverStorage;
+    newSocket = accept(serverSocket, (struct sockaddr *) &serverStorage, &addr_size);
+    //for each client request creates a thread and assign the client request to it to process
+    //so the main thread can entertain next request
 
-     printf("inserir na lista socket: %d\n",newSocket);
-     nplayers++;
-     client_list = insertLastLinkedList(client_list, newSocket);
-     client_list->socket = newSocket;
-     client_list->nplayers++;
-     //client_list->color[0] = color[0];
+   nplayers++;
+   client_list = insertLastLinkedList(client_list, newSocket, i/*colors*/);
+   //client_list->color[0] = color[0];
+   printf("Acabou inserção na lista\n");
 
-    if( pthread_create(&tid[i], NULL, socketThread, (void *)newSocket) != 0 ){
+   i++;
+    if( pthread_create(&tid[i], NULL, socketThread, (void *)&newSocket) != 0 ){
       printf("Failed to create thread\n");
     }
-    i++;
+
 
     for(j=0; j<i;j++){
       pthread_join(tid[j],NULL);
