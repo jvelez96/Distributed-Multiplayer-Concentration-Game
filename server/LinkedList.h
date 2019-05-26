@@ -68,9 +68,12 @@ typedef void * Item;
  ******************************************************************************/
 typedef struct LinkedListStruct
 {
+  int nplayers;
+  int color[3];
+  int socket;
   Item this;
   struct LinkedListStruct *next;
-}LinkedList;
+}PlayerList;
 
 
 
@@ -88,7 +91,7 @@ typedef struct LinkedListStruct
  *  Return value:
  *    Returns the pointer to a new linked list.
  ******************************************************************************/
-LinkedList * initLinkedList(void);
+PlayerList* initLinkedList(void);
 
 
 
@@ -101,14 +104,14 @@ LinkedList * initLinkedList(void);
  *
  *  Arguments:
  *    Pointer to the first element of a linked list:
- *      (LinkedList *) first
+ *      (PlayerList*) first
  *    Function to free the memory allocated to the items:
  *      void freeItem(Item)
  *
  *  Return value:
  *    None
  ******************************************************************************/
-void freeLinkedList(LinkedList * first);
+void freeLinkedList(PlayerList* first);
 
 
 
@@ -121,12 +124,12 @@ void freeLinkedList(LinkedList * first);
  *
  *  Arguments:
  *    Pointer to the first node of the linked list:
- *        (LinkedList *) first
+ *        (PlayerList*) first
  *
  *  Return value:
  *    Returns the length of the linked list.
  ******************************************************************************/
-int lengthLinkedList(LinkedList * first);
+int lengthLinkedList(PlayerList* first);
 
 
 
@@ -139,14 +142,14 @@ int lengthLinkedList(LinkedList * first);
  *
  *  Arguments:
  *    Pointer to the current linked list node:
- *        (LinkedList *) node
+ *        (PlayerList*) node
  *
  *  Return value:
  *    Returns the pointer to the next node of a linked list. NULL
  *   is returned in case the current node is empty or there is no
  *   node following the current node.
  ******************************************************************************/
-LinkedList * getNextNodeLinkedList(LinkedList * node);
+PlayerList* getNextNodeLinkedList(PlayerList* node);
 
 
 
@@ -159,13 +162,13 @@ LinkedList * getNextNodeLinkedList(LinkedList * node);
  *
  *  Arguments:
  *    Pointer to a linked list node:
- *        (LinkedList *) node
+ *        (PlayerList*) node
  *
  *  Return value:
  *    Returns the pointer to the item of a linked list node. NULL
  *   is returned if the node is NULL (or if the item is NULL).
  ******************************************************************************/
-Item getItemLinkedList(LinkedList * node);
+Item getItemLinkedList(PlayerList* node);
 
 
 
@@ -180,14 +183,14 @@ Item getItemLinkedList(LinkedList * node);
  *    Item to associate to the new node:
  *      Item this
  *    Pointer to the next node:
- *      (LinkedList *) next
+ *      (PlayerList*) next
  *
  *  Return value:
  *    Returns the pointer to the new node.
  ******************************************************************************/
-//LinkedList * insertUnsortedLinkedList(LinkedList * next, Item this);
+//PlayerList* insertUnsortedLinkedList(PlayerList* next, Item this);
 
-LinkedList *insertLastLinkedList(LinkedList * head, Item this);
+PlayerList* insertLastLinkedList(PlayerList* head, Item this);
 
 
 
@@ -200,7 +203,7 @@ LinkedList *insertLastLinkedList(LinkedList * head, Item this);
  *
  *  Arguments:
  *    Pointer to the first node of a sorted linked list:
- *        (LinkedList *) first
+ *        (PlayerList*) first
  *    Pointer to item to be inserted:
  *        Item item
  *    Pointer to function to compare two items:
@@ -219,7 +222,7 @@ LinkedList *insertLastLinkedList(LinkedList * head, Item this);
  *  Return value:
  *    Returns the pointer to the first node of the sorted linked list.
  ******************************************************************************/
-LinkedList * insertSortedLinkedList(LinkedList * first,
+PlayerList* insertSortedLinkedList(PlayerList * first,
                            Item item,
                            int (* comparisonItemFnt)
                            (Item item1, Item item2),

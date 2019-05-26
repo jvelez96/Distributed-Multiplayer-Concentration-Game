@@ -1,10 +1,11 @@
 #include "server_th.h"
 
-LinkedList *client_list;
+PlayerList *client_list = NULL;
 
 int main(){
-  int i=0, j;
+  int nplayers=0, j;
   int serverSocket, newSocket;
+  int i=0;
 
   struct sockaddr_in serverAddr;
   struct sockaddr_storage serverStorage;
@@ -48,22 +49,21 @@ int main(){
      //so the main thread can entertain next request
 
      printf("inserir na lista socket: %d\n",newSocket);
+     nplayers++;
+     client_list = insertLastLinkedList(client_list, newSocket);
+     client_list->socket = newSocket;
+     client_list->nplayers++;
+     //client_list->color[0] = color[0];
 
-     args->clientlist = insertLastLinkedList(args->clientlist, newSocket);
-     args->curr_socket = newSocket;
-     args->curr_thread = i;
-     printf("inserido: %d\n", args->clientlist->this);
+    if( pthread_create(&tid[i], NULL, socketThread, (void *)newSocket) != 0 ){
+      printf("Failed to create thread\n");
+    }
+    i++;
 
-      if( pthread_create(&tid[i], NULL, socketThread, (void *)args) != 0 ){
-        printf("Failed to create thread\n");
-      }
-      i++;
-      arg->nthreads = i;
-
-      for(j=0; j<i;j++){
-        pthread_join(tid[j],NULL);
-      }
-      printf("acabou\n");
+    for(j=0; j<i;j++){
+      pthread_join(tid[j],NULL);
+    }
+    printf("acabou\n");
   }
   return 0;
 }

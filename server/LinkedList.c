@@ -34,7 +34,7 @@
  *  Return value:
  *    Returns the pointer to a new linked list.
  ******************************************************************************/
-LinkedList * initLinkedList(void)
+PlayerList * initLinkedList(void)
 {
   return NULL;
 }
@@ -55,10 +55,10 @@ LinkedList * initLinkedList(void)
  *  Return value:
  *    None
  ******************************************************************************/
-void freeLinkedList(LinkedList * first)
+void freeLinkedList(PlayerList * first)
 {
-  LinkedList * next;
-  LinkedList * aux;
+  PlayerList * next;
+  PlayerList * aux;
 
   /* Cycle from the first to the last element                     */
   for(aux = first; aux != NULL; aux = next)
@@ -92,9 +92,9 @@ void freeLinkedList(LinkedList * first)
  *  Return value:
  *    Returns the length of the linked list.
  ******************************************************************************/
-int lengthLinkedList(LinkedList * first)
+int lengthLinkedList(PlayerList * first)
 {
-  LinkedList * aux;
+  PlayerList * aux;
   int counter;
 
   /* Length determination cycle                                   */
@@ -123,7 +123,7 @@ int lengthLinkedList(LinkedList * first)
  *   is returned in case the current node is empty or there is no
  *   node following the current node.
  ******************************************************************************/
-LinkedList * getNextNodeLinkedList(LinkedList * node)
+PlayerList * getNextNodeLinkedList(PlayerList * node)
 {
 	if(node == NULL || node->next == NULL)
 		return NULL;
@@ -148,7 +148,7 @@ LinkedList * getNextNodeLinkedList(LinkedList * node)
  *    Returns the pointer to the item of a linked list node. NULL
  *   is returned if the node is NULL (or if the item is NULL).
  ******************************************************************************/
-Item getItemLinkedList(LinkedList * node)
+Item getItemLinkedList(PlayerList * node)
 {
   /* Check if node is not empty                                   */
   if(node == NULL)
@@ -175,12 +175,12 @@ Item getItemLinkedList(LinkedList * node)
  *  Return value:
  *    Returns the pointer to the node.
  ******************************************************************************/
-LinkedList *insertLastLinkedList(LinkedList * head, Item this)
+PlayerList *insertLastLinkedList(PlayerList * head, Item this)
 {
-  LinkedList * new;
+  PlayerList * new;
 
   /* Memory allocation                                            */
-  new = (LinkedList *) malloc(sizeof(LinkedList));
+  new = (PlayerList *) malloc(sizeof(PlayerList));
 
   if(new == NULL){
         fprintf(stderr, "Unable to allocate memory for new node\n");
@@ -201,7 +201,7 @@ LinkedList *insertLastLinkedList(LinkedList * head, Item this)
     } else {
         //else loop through the list and find the last
         //node, insert next to it
-        LinkedList *curr;
+        PlayerList *curr;
         curr = head;
         while (curr->next != NULL) {
           curr = curr->next;
@@ -244,7 +244,7 @@ LinkedList *insertLastLinkedList(LinkedList * head, Item this)
  *  Return value:
  *    Returns the pointer to the first node of the sorted linked list.
  ******************************************************************************/
-LinkedList * insertSortedLinkedList(LinkedList * first,
+PlayerList * insertSortedLinkedList(PlayerList * first,
                            Item item,
                            int (* comparisonItemFnt)
                            (Item item1, Item item2),
