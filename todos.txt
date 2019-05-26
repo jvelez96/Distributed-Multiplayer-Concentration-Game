@@ -1,0 +1,36 @@
+To Dos:
+
+1- Ver a lógica do board_library.c para perceber como
+guardar as estruturas de jogadas
+
+2- Ver como passar as jogadas atraves de TCP
+
+3- Main Server Logic
+
+	-Listening
+	.Connect
+	-Accept socket
+	-Thread Create(serve_struct)
+
+4- Thread Logic
+	* Check if there are two players in the struct
+
+	*send(cor, board, status)
+	(Entrar no while, esperar...)
+	.IF(status==PLAY)
+		-JOGAR
+	ELSE
+		RECV
+			IF(status == PLAY)
+				send(JOGADA)
+	*IF(sstr1==str2)
+		correctPlay(JOGADA);
+
+Mensagens:
+
+1- *init_client* (messagetype,color, board, status)
+
+"0;123201233;boardboardboard;play"
+"0;2;boardboardboard;wait"
+
+2 - *
