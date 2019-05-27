@@ -8,6 +8,7 @@ int main(int argc, char* argv[]){
   int serverSocket, newSocket;
   int *colors;
   int i=0;
+  char buffer[100];
 
   struct sockaddr_in serverAddr;
   struct sockaddr_storage serverStorage;
@@ -21,6 +22,11 @@ int main(int argc, char* argv[]){
 
   if(!sscanf(argv[1], "%d", &size)){
     printf("Incorrect format provided for seed\n");
+    exit(1);
+  }
+
+  if(size%2 != 0){
+    printf("Only even numbers allowed for grid size\n");
     exit(1);
   }
 
@@ -62,9 +68,11 @@ int main(int argc, char* argv[]){
 
     printf("color:%d %d %d\n", colors[0], colors[1], colors[2]);
    nplayers++;
-   client_list = insertLastLinkedList(client_list, newSocket, i/*colors*/);
-   //client_list->color[0] = color[0];
-   printf("Acabou inserção na lista\n");
+   client_list = insertLastLinkedList(client_list, newSocket, i/*, colors*/);
+
+   memset(buffer, 0, 100); //erase buffer before inserting data
+   sprintf(buffer, "%d %d %d %d", colors[0], colors[1], colors[2], size);
+   send(newSocket,buffer,100,0);
 
    i++;
     if( pthread_create(&tid[i], NULL, socketThread, (void *)&newSocket) != 0 ){
