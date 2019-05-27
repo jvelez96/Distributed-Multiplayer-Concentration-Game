@@ -50,7 +50,15 @@ int main(){
 			exit(2);
 	}
 
-	create_board_window(300, 300,  4);
+	
+	char buff[MAX];
+	bzero(buff, MAX);
+	read(sockfd, buff, sizeof(buff));
+	int dim, color_0, color_1, color_2;
+	sscanf(buff, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
+	printf("jogada (%d,%d,%d,%d)", color_0, color_1, color_2, dim);
+	
+	create_board_window(300, 300,  dim);
 
 	while (!done){
 		while (SDL_PollEvent(&event)) {
@@ -63,15 +71,13 @@ int main(){
 					printf("click (%d %d)\n", event.button.x, event.button.y);
 
 					//TO DO: funcao que comunica a jogada para o servidor
-					char buff[MAX];
+					
 					bzero(buff, MAX);
 					sprintf(buff, "(%d,%d)", event.button.x, event.button.y);
 					write(sockfd, buff, sizeof(buff));
 
 					bzero(buff, MAX);
 					read(sockfd, buff, sizeof(buff));
-					printf("%s\n", buff);
-					exit(0);
 
 					int code, board_x, board_y, aux_x, aux_y;
 					char aux[3], aux1[3];
@@ -84,7 +90,7 @@ int main(){
 					switch (code) {
 						case 1:
 							strcpy(aux1,aux);
-							paint_card(board_x, board_y, 7, 200, 100);
+							paint_card(board_x, board_y, color_0, color_1, color_2);
 							write_card(board_x, board_y, aux1, 200, 200, 200);
 							aux_x = board_x;
 							aux_y = board_y;
@@ -92,15 +98,15 @@ int main(){
 						case 3:
 						  done = 1;
 						case 2:
-							paint_card(aux_x, aux_y, 107, 200, 100);
+							paint_card(aux_x, aux_y, color_0, color_1, color_2);
 							write_card(aux_x, aux_y, aux1, 0, 0, 0);
-							paint_card(board_x, board_y , 107, 200, 100);
+							paint_card(board_x, board_y , color_0, color_1, color_2);
 							write_card(board_x, board_y, aux, 0, 0, 0);
 							break;
 						case -2:
-							paint_card(aux_x, aux_y, 107, 200, 100);
+							paint_card(aux_x, aux_y, color_0, color_1, color_2);
 							write_card(aux_x, aux_y, aux1, 255, 0, 0);
-							paint_card(board_x, board_y , 107, 200, 100);
+							paint_card(board_x, board_y , color_0, color_1, color_2);
 							write_card(board_x, board_y, aux, 255, 0, 0);
 							sleep(2);
 							paint_card(aux_x, aux_y , 255, 255, 255);
