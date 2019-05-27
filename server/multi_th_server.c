@@ -1,20 +1,31 @@
 #include "server_th.h"
 
 PlayerList *client_list = NULL;
+int size;
 
-int main(){
+int main(int argc, char* argv[]){
   int nplayers=0, j;
   int serverSocket, newSocket;
+  int *colors;
   int i=0;
 
   struct sockaddr_in serverAddr;
   struct sockaddr_storage serverStorage;
 
-  client_data *args = (client_data *)malloc(sizeof(client_data));
-  args->clientlist = NULL;
-
   socklen_t addr_size;
 
+  if (argc!=2){
+    printf("Incorrect number of arguments.\n");
+    exit(1);
+  }
+
+  if(!sscanf(argv[1], "%d", &size)){
+    printf("Incorrect format provided for seed\n");
+    exit(1);
+  }
+
+  printf("initializing a board with size: %d\n", size);
+  init_board(size);
   //client_data *clientdata = (client_data *) malloc(sizeof(client_data));
 
   //Create the socket.
@@ -47,7 +58,9 @@ int main(){
     newSocket = accept(serverSocket, (struct sockaddr *) &serverStorage, &addr_size);
     //for each client request creates a thread and assign the client request to it to process
     //so the main thread can entertain next request
+    colors = get_colors();
 
+    printf("color:%d %d %d\n", colors[0], colors[1], colors[2]);
    nplayers++;
    client_list = insertLastLinkedList(client_list, newSocket, i/*colors*/);
    //client_list->color[0] = color[0];

@@ -1,7 +1,5 @@
-#include <stdlib.h>
 #include "board_library.h"
-#include <stdio.h>
-#include <string.h>
+
 
 int dim_board;
 board_place * board;

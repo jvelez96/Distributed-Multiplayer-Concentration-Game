@@ -5,6 +5,14 @@ char buffer[1024];
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 extern PlayerList *client_list;
 
+int *get_colors(){
+  static int colors[3];
+
+  for(int i=0;i<3;i++){
+    colors[i] = rand() % 255;
+  }
+  return colors;
+}
 
 void print_linked_list(PlayerList *head){
   PlayerList *curr;
