@@ -173,7 +173,6 @@ PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_numbe
     //check for first insertion
     if(head->next == NULL){
         head->next = new;
-        head->next->next = NULL;
     } else {
         //else loop through the list and find the last
         //node, insert next to it
