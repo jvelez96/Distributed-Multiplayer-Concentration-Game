@@ -78,6 +78,7 @@ int main(int argc, char* argv[]){
    printf("send buffer: %s\n", buffer);
    if(nplayers >= 2){
      //send board
+     //
    }
 
    i++;
