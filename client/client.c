@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <unistd.h>
-#define MAX 80
+#define MAX 200
 #define PORT 8080
 #define SA struct sockaddr
 #include <sys/socket.h>
@@ -9,56 +9,90 @@
 
 #include "UI_library.h"
 
-int main(){
-
+int create_socket( char * ip, int port )
+{
 	//Create session with the server
-	int sockfd, connfd;
-    struct sockaddr_in servaddr, cli;
+	int sockfd;
+    struct sockaddr_in servaddr;
 
     // socket create and varification
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd == -1) {
-        printf("socket creation failed...\n");
-        exit(0);
+    sockfd = socket( AF_INET, SOCK_STREAM, 0 );
+    if ( sockfd == -1 ) {
+        printf( "socket creation failed...\n" );
+        exit( 0 );
     }
     else
-        printf("Socket successfully created..\n");
-    bzero(&servaddr, sizeof(servaddr));
+        printf( "Socket successfully created..\n" );
+    bzero( &servaddr, sizeof( servaddr ));
 
     // assign IP, PORT
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    servaddr.sin_port = htons(PORT);
-
-    // connect the client socket to server socket
+    servaddr.sin_addr.s_addr = inet_addr( ip );
+    servaddr.sin_port = htons( port );
+	
+	// connect the client socket to server socket
     if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
         printf("connection with the server failed...\n");
         exit(0);
     }
     else
         printf("connected to the server..\n");
+	
+	return sockfd;
+}
 
-	SDL_Event event;
-	int done = 0;
-
-	 if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
+void start_ui()
+{
+	if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
 		 printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
 		 exit(-1);
 	}
 	if(TTF_Init()==-1) {
-			printf("TTF_Init: %s\n", TTF_GetError());
-			exit(2);
+		printf("TTF_Init: %s\n", TTF_GetError());
+		exit(2);
 	}
+}
 
+// void * client_listening_server(void * arg)
+// {
+	// int fd;
 	
+	// fd = create_socket( "127.0.0.1", 8888 );
+	
+	
+// }
+
+int main(){
+	
+	//Create session with the server
+	int sockfd;
+    struct sockaddr_in servaddr, cli;
 	char buff[MAX];
-	bzero(buff, MAX);
-	read(sockfd, buff, sizeof(buff));
+	
+	int done = 0;
+	SDL_Event event;
+	
+	//Player and board constants
 	int dim, color_0, color_1, color_2;
+	int color_r, color_g, color_b;
+	int code, board_x, board_y, aux_x, aux_y;
+	char xx [3];
+	
+	sockfd = create_socket( "127.0.0.1", 8080 );
+	start_ui();
+	
+	bzero(buff, MAX);
+	recv(sockfd, buff, sizeof(buff), 0);
 	sscanf(buff, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
-	printf("jogada (%d,%d,%d,%d)", color_0, color_1, color_2, dim);
+	printf("first information (%d,%d,%d,%d)\n", color_0, color_1, color_2, dim);
 	
 	create_board_window(300, 300,  dim);
+	
+	bzero(buff, MAX);
+	recv(sockfd, buff, sizeof(buff), 0);
+	sscanf(buff, "%d %d %c%c %d %d %d", &aux_x, &aux_y, &xx[0], &xx[1], &color_r, &color_g, &color_b);
+	printf("Lido: %d %d %c%c %d %d %d\n", aux_x, aux_y, xx[0], xx[1], color_r, color_g, color_b);
+	exit(0);
 
 	while (!done){
 		while (SDL_PollEvent(&event)) {
@@ -74,12 +108,12 @@ int main(){
 					
 					bzero(buff, MAX);
 					sprintf(buff, "(%d,%d)", event.button.x, event.button.y);
-					write(sockfd, buff, sizeof(buff));
+					send(sockfd, buff, sizeof(buff), 0);
 
 					bzero(buff, MAX);
-					read(sockfd, buff, sizeof(buff));
+					recv(sockfd, buff, sizeof(buff), 0);
 
-					int code, board_x, board_y, aux_x, aux_y;
+					
 					char aux[3], aux1[3];
 					aux[2] = '\0';
 					aux1[2] = '\0';
