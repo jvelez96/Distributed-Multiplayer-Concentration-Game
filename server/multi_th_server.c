@@ -16,6 +16,8 @@ int main(int argc, char* argv[]){
 
   socklen_t addr_size;
 
+  PlayerList *curr;
+
   if (argc!=2){
     printf("Incorrect number of arguments.\n");
     exit(1);
@@ -77,7 +79,10 @@ int main(int argc, char* argv[]){
     printf("color:%d %d %d\n", colors[0], colors[1], colors[2]);
    nplayers++;
    client_list = insertLastLinkedList(client_list, newSocket, i, colors, 0);
+   i++;
    print_linked_list(client_list);
+   curr = get_last_player(client_list);
+   printf("got player %d\n", curr->player_id);
 
    memset(buffer, 0, BUFFERSIZE); //erase buffer before inserting data
    sprintf(buffer, "%d %d %d %d", colors[0], colors[1], colors[2], size);
@@ -90,7 +95,6 @@ int main(int argc, char* argv[]){
      send_board();
    }
    printf("create thread\n");
-   i++;
     if( pthread_create(&tid[i], NULL, first_play_thread, (void *)&newSocket) != 0 ){
       printf("Failed to create thread\n");
     }

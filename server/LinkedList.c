@@ -197,9 +197,11 @@ PlayerList *get_last_player(PlayerList *head){
   PlayerList *curr;
 
   curr = head;
+  printf("starting player %d\n\n", curr->player_id);
 
   while(curr->next != NULL){
     curr = curr->next;
   }
+  printf("returning player %d\n\n", curr->player_id);
   return curr;
 }

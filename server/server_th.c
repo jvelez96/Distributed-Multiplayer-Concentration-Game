@@ -1,6 +1,5 @@
 #include "server_th.h"
 
-char client_message[2000];
 extern pthread_mutex_t lock;
 extern PlayerList *client_list;
 extern int size;
@@ -103,7 +102,6 @@ void * first_play_thread(void *socket)
 {
   //int newSocket = *((int *)arg);
   int done = 0;
-  int i;
   int newSocket = *((int*)socket);
   char buffer[BUFFERSIZE];
   PlayerList *player_info;
