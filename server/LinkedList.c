@@ -196,6 +196,8 @@ PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_id ,i
 PlayerList *get_last_player(PlayerList *head){
   PlayerList *curr;
 
+  curr = head;
+
   while(curr->next != NULL){
     curr = curr->next;
   }

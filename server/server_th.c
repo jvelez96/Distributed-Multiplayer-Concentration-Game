@@ -1,7 +1,6 @@
 #include "server_th.h"
 
 char client_message[2000];
-char buffer[1024];
 extern pthread_mutex_t lock;
 extern PlayerList *client_list;
 extern int size;
@@ -93,7 +92,7 @@ void print_linked_list(PlayerList *head){
   }
 
   while(curr != NULL) {
-    printf("socket: %d for player %d with a game with %d players\n", curr->socket,i, curr->player_id);
+    printf("socket: %d for player %d with color %d %d %d and status %d\n", curr->socket, curr->player_id, curr->color[0], curr->color[1], curr->color[2], curr->status);
     curr = curr->next;
     i++;
   }
@@ -106,7 +105,21 @@ void * first_play_thread(void *socket)
   int i;
   int newSocket = *((int*)socket);
   char buffer[BUFFERSIZE];
-  PlayerList *player_info = get_last_player(client_list);
+  PlayerList *player_info;
+
+  printf("get last player\n");
+
+
+  if(player_info == NULL){
+    printf("error in list\n");
+    close(newSocket);
+    pthread_exit(NULL);
+  }else{
+    player_info = get_last_player(client_list);
+    printf("got player %d\n", player_info->player_id);
+  }
+
+  printf("entrou na thread\n" );
 
   while(!done){
     memset(buffer, 0, BUFFERSIZE);
@@ -116,18 +129,9 @@ void * first_play_thread(void *socket)
       //remove from list
       printf("player %d exited\n", player_info->player_id);
       close(newSocket);
+      done = 1;
     }
   }
-
-  //pthread_mutex_lock(&lock);
-  sprintf(buffer, "Thread with socket %d\n", newSocket);
-  printf("buffer: %s\n", buffer);
-  sleep(1);
-
-  printf("Exit socketThread \n");
-
-  send(newSocket,buffer,40,0);
-  print_linked_list(client_list);
 
   close(newSocket);
   pthread_exit(NULL);

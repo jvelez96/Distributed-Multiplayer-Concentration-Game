@@ -9,7 +9,7 @@ int main(int argc, char* argv[]){
   int serverSocket, newSocket;
   int *colors;
   int i=0;
-  char buffer[100];
+  char buffer[BUFFERSIZE];
 
   struct sockaddr_in serverAddr;
   struct sockaddr_storage serverStorage;
@@ -86,9 +86,10 @@ int main(int argc, char* argv[]){
    printf("send buffer: %s\n", buffer);
    if(nplayers >= 2){
      //send board
+     print_linked_list(client_list);
      send_board();
    }
-
+   printf("create thread\n");
    i++;
     if( pthread_create(&tid[i], NULL, first_play_thread, (void *)&newSocket) != 0 ){
       printf("Failed to create thread\n");
