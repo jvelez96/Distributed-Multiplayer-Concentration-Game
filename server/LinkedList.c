@@ -150,7 +150,7 @@ PlayerList * getNextNodeLinkedList(PlayerList * node)
  *  Return value:
  *    Returns the pointer to the node.
  ******************************************************************************/
-PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_number /*,int *colors*/)
+PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_number ,int *colors, int status)
 {
   PlayerList * new;
 
@@ -165,6 +165,10 @@ PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_numbe
   /* Initialize new node                                          */
   new->socket = socket;
   new->player_number = player_number;
+  new->color[0] =  colors[0];
+  new->color[1] =  colors[1];
+  new->color[2] =  colors[2];
+  new->status = status;
   new->next = NULL;
 
   if(head == NULL) {

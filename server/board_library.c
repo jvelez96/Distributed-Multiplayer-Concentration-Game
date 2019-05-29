@@ -18,6 +18,7 @@ void init_board(int dim){
   int i, j;
   char * str_place;
 
+
   dim_board= dim;
   n_corrects = 0;
   play1[0]= -1;
@@ -25,6 +26,9 @@ void init_board(int dim){
 
   for( i=0; i < (dim_board*dim_board); i++){
     board[i].v[0] = '\0';
+    board[i].color[0] = COLORNR;
+    board[i].color[1] = COLORNR;
+    board[i].color[2] = COLORNR;
   }
 
   for (char c1 = 'a' ; c1 < ('a'+dim_board); c1++){

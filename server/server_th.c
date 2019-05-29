@@ -4,6 +4,10 @@ char client_message[2000];
 char buffer[1024];
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 extern PlayerList *client_list;
+extern int size;
+extern board_place * board;
+extern int play1[2];
+extern int n_corrects;
 
 void read_buffer(char *buffer, int *color, struct play_response *play, char *status, int *buffer_type)
 {
@@ -43,19 +47,31 @@ void write_buffer(char *buffer, int *color, struct play_response *play, char *st
   sprintf(buffer,"%d;%d;%d;%d;%d;%d;%d;%s;%s;%s", *buffer_type, *color, play->code, play->play1[0], play->play1[1], play->play2[0], play->play2[1], play->str_play1, play->str_play2, status);
 }
 
-void send_board(int socket, int size){
+void send_board(){
   int i;
   int x, y;
-  char *buffer[BUFFERSIZE];
+  char buffer[BUFFERSIZE];
+  PlayerList *curr = client_list;
 
   for(x=0;x<size;x++){
     for(y=0;y<size;y++){
       memset(buffer, 0, BUFFERSIZE);
       i = linear_conv(x,y);
       sprintf(buffer, "%d %d %s %d %d %d", x, y, board[i].v, board[i].color[0], board[i].color[1], board[i].color[2]);
-      send(socket, buffer, BUFFERSIZE, 0);
-      printf("sending buffer %s for cell x: %d y: %d of board i: %d\n",buffer, x,y,i);
+      while(curr != NULL){
+        //only sends board if the player has not received it yet
+        if(curr->status == 0){
+          send(curr->socket, buffer, BUFFERSIZE, 0);
+          printf("sending buffer %s for cell x: %d y: %d of board i: %d\n",buffer, x,y,i);
+        }
+        curr = curr->next;
+      }
     }
+  }
+  curr = client_list;
+  while(curr != NULL){
+    curr->status = 1;
+    curr = curr->next;
   }
 }
 

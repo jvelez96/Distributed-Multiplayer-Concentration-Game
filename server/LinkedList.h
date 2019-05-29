@@ -56,6 +56,12 @@
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 #include<pthread.h>
+#include <netdb.h>
+#include <stdlib.h>
+#include <string.h>
+#define ASCII 48
+#define BUFFERSIZE 150
+#define COLORNR 255
 
 typedef void * Item;
 
@@ -71,6 +77,7 @@ typedef struct LinkedListStruct
   int player_number;
   int color[3];
   int socket;
+  int status;
   struct LinkedListStruct *next;
 }PlayerList;
 
@@ -154,7 +161,7 @@ PlayerList* getNextNodeLinkedList(PlayerList* node);
  ******************************************************************************/
 //PlayerList* insertUnsortedLinkedList(PlayerList* next, Item this);
 
-PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_number /*,int *colors*/);
+PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_number ,int *colors, int status);
 
 
 

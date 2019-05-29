@@ -1,8 +1,9 @@
 #include "LinkedList.h"
-#define BUFFERSIZE 150
+
 
 typedef struct board_place{
   char v[3];
+  int color[3];
 } board_place;
 
 typedef struct play_response{
@@ -19,3 +20,4 @@ typedef struct play_response{
 char * get_board_place_str(int i, int j);
 void init_board(int dim);
 play_response board_play (int x, int y);
+int linear_conv(int i, int j);
