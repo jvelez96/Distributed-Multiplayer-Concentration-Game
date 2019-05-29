@@ -109,13 +109,13 @@ void * first_play_thread(void *socket)
 
   printf("get last player\n");
 
+  player_info = get_last_player(client_list);
 
   if(player_info == NULL){
     printf("error in list\n");
     close(newSocket);
     pthread_exit(NULL);
   }else{
-    player_info = get_last_player(client_list);
     printf("got player %d\n", player_info->player_id);
   }
 
