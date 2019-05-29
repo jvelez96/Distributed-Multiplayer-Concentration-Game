@@ -113,6 +113,7 @@ void * first_play_thread(void *socket)
     recv(newSocket, buffer, BUFFERSIZE,0);
 
     if(strcmp(buffer, "exit")){
+      //remove from list
       printf("player %d exited\n", player_info->player_id);
       close(newSocket);
     }
