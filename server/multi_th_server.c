@@ -16,8 +16,6 @@ int main(int argc, char* argv[]){
 
   socklen_t addr_size;
 
-  PlayerList *curr;
-
   if (argc!=2){
     printf("Incorrect number of arguments.\n");
     exit(1);
@@ -53,10 +51,12 @@ int main(int argc, char* argv[]){
   //Listen on the socket, with 40 max connection requests queued
 
   //Initializing mutex locks
+  /*
   lock = (pthread_mutex_t **)malloc (sizeof(pthread_mutex_t *) * size);
   for(j=0;j<size;j++){
     lock[j]= (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t *) * size);
   }
+  */
 
   if(listen(serverSocket,50)==0)
     printf("Listening\n");
@@ -81,14 +81,11 @@ int main(int argc, char* argv[]){
    client_list = insertLastLinkedList(client_list, newSocket, i, colors, 0);
    i++;
    print_linked_list(client_list);
-   curr = get_last_player(client_list);
-   printf("got player %d\n", curr->player_id);
 
    memset(buffer, 0, BUFFERSIZE); //erase buffer before inserting data
    sprintf(buffer, "%d %d %d %d", colors[0], colors[1], colors[2], size);
    send(newSocket,buffer,BUFFERSIZE,0);
 
-   printf("send buffer: %s\n", buffer);
    if(nplayers >= 2){
      //send board
      print_linked_list(client_list);

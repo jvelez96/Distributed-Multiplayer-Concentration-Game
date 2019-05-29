@@ -29,7 +29,7 @@ int create_socket( char * ip, int port )
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = inet_addr( ip );
     servaddr.sin_port = htons( port );
-	
+
 	// connect the client socket to server socket
     if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
         printf("connection with the server failed...\n");
@@ -37,7 +37,7 @@ int create_socket( char * ip, int port )
     }
     else
         printf("connected to the server..\n");
-	
+
 	return sockfd;
 }
 
@@ -57,58 +57,58 @@ void start_ui()
 // {	printf("In thread listening plays\n");
 	// int fd;
 	// buff[MAX];
-	
+
 	// fd = create_socket( "127.0.0.1", 8888 );
-	
+
 	// bzero(buff, MAX);
 	// recv(sockfd, buff, sizeof(buff), 0);
 	// sscanf(buff, "%d %d %c%c %d %d %d", &aux_x, &aux_y, &xx[0], &xx[1], &color_r, &color_g, &color_b);
 	// printf("Lido: %d %d %c%c %d %d %d\n", aux_x, aux_y, xx[0], xx[1], color_r, color_g, color_b);
-	
+
 	// xx[3] = '\0';
-	
+
 	// paint_card(aux_x, aux_y, color_r, color_g, color_b);
 	// write_card(board_x, board_y, xx, color_r, color_g, color_b);
 // }
 
 int main(){
-	
+
 	//Create session with the server
 	int sockfd;
     struct sockaddr_in servaddr, cli;
 	char buff[MAX];
-	
+
 	int done = 0;
 	SDL_Event event;
-	
+
 	//Player and board constants
 	int dim, color_0, color_1, color_2;
 	int color_r, color_g, color_b;
 	int code, board_x, board_y, aux_x, aux_y;
 	char xx [3];
-	
+
 	sockfd = create_socket( "127.0.0.1", 8080 );
 	start_ui();
-	
+
 	bzero(buff, MAX);
 	recv(sockfd, buff, sizeof(buff), 0);
 	sscanf(buff, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
 	printf("first information (%d,%d,%d,%d)\n", color_0, color_1, color_2, dim);
-	
-	
-	
+
+
+
 	bzero(buff, MAX);
 	recv(sockfd, buff, sizeof(buff), 0);
 	sscanf(buff, "%d %d %c%c %d %d %d", &aux_x, &aux_y, &xx[0], &xx[1], &color_r, &color_g, &color_b);
 	printf("Lido: %d %d %c%c %d %d %d\n", aux_x, aux_y, xx[0], xx[1], color_r, color_g, color_b);
-	
+
 	xx[3] = '\0';
-	
+
 	paint_card(aux_x, aux_y, color_r, color_g, color_b);
 	write_card(board_x, board_y, xx, color_r, color_g, color_b);
-	
+
 	create_board_window(300, 300,  dim);
-	
+
 	exit(0);
 
 	while (!done){
@@ -122,7 +122,7 @@ int main(){
 					printf("click (%d %d)\n", event.button.x, event.button.y);
 
 					//TO DO: funcao que comunica a jogada para o servidor
-					
+
 					bzero(buff, MAX);
 					sprintf(buff, "(%d,%d)", event.button.x, event.button.y);
 					send(sockfd, buff, sizeof(buff), 0);
@@ -130,7 +130,7 @@ int main(){
 					bzero(buff, MAX);
 					recv(sockfd, buff, sizeof(buff), 0);
 
-					
+
 					char aux[3], aux1[3];
 					aux[2] = '\0';
 					aux1[2] = '\0';

@@ -100,13 +100,10 @@ void print_linked_list(PlayerList *head){
 
 void * first_play_thread(void *socket)
 {
-  //int newSocket = *((int *)arg);
   int done = 0;
   int newSocket = *((int*)socket);
   char buffer[BUFFERSIZE];
   PlayerList *player_info;
-
-  printf("get last player\n");
 
   player_info = get_last_player(client_list);
 
@@ -115,10 +112,9 @@ void * first_play_thread(void *socket)
     close(newSocket);
     pthread_exit(NULL);
   }else{
-    printf("got player %d\n", player_info->player_id);
+    printf("Reading 1st play of player %d\n", player_info->player_id);
   }
 
-  printf("entrou na thread\n" );
 
   while(!done){
     memset(buffer, 0, BUFFERSIZE);
