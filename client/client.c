@@ -75,7 +75,7 @@ int main(){
 
 	//Create session with the server
 	int sockfd;
-    struct sockaddr_in servaddr, cli;
+    	struct sockaddr_in servaddr, cli;
 	char buff[MAX];
 
 	int done = 0;
@@ -102,12 +102,12 @@ int main(){
 	sscanf(buff, "%d %d %c%c %d %d %d", &aux_x, &aux_y, &xx[0], &xx[1], &color_r, &color_g, &color_b);
 	printf("Lido: %d %d %c%c %d %d %d\n", aux_x, aux_y, xx[0], xx[1], color_r, color_g, color_b);
 
-	xx[3] = '\0';
-
-	paint_card(aux_x, aux_y, color_r, color_g, color_b);
-	write_card(board_x, board_y, xx, color_r, color_g, color_b);
+	xx[2] = '\0';
 
 	create_board_window(300, 300,  dim);
+	
+	paint_card(aux_x, aux_y, color_r, color_g, color_b);
+	write_card(aux_x, aux_y, xx, color_r, color_g, color_b);
 
 	exit(0);
 
