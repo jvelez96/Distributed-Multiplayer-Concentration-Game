@@ -2,7 +2,7 @@
 
 char client_message[2000];
 char buffer[1024];
-pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+extern pthread_mutex_t lock;
 extern PlayerList *client_list;
 extern int size;
 extern board_place * board;
@@ -93,26 +93,34 @@ void print_linked_list(PlayerList *head){
   }
 
   while(curr != NULL) {
-    printf("socket: %d for player %d with a game with %d players\n", curr->socket,i, curr->player_number);
+    printf("socket: %d for player %d with a game with %d players\n", curr->socket,i, curr->player_id);
     curr = curr->next;
     i++;
   }
 }
 
-void * socketThread(void *socket)
+void * first_play_thread(void *socket)
 {
   //int newSocket = *((int *)arg);
   int done = 0;
   int i;
   int newSocket = *((int*)socket);
+  char buffer[BUFFERSIZE];
+  PlayerList *player_info = get_last_player(client_list);
 
-  printf("%d and nummer players: %d\n", client_list->socket, client_list->player_number);
-  //recv(newSocket , client_message , 2000 , 0);
-  // Send message to the client socket
-  pthread_mutex_lock(&lock);
+  while(!done){
+    memset(buffer, 0, BUFFERSIZE);
+    recv(newSocket, buffer, BUFFERSIZE,0);
+
+    if(strcmp(buffer, "exit")){
+      printf("player %d exited\n", player_info->player_id);
+      close(newSocket);
+    }
+  }
+
+  //pthread_mutex_lock(&lock);
   sprintf(buffer, "Thread with socket %d\n", newSocket);
   printf("buffer: %s\n", buffer);
-  pthread_mutex_unlock(&lock);
   sleep(1);
 
   printf("Exit socketThread \n");

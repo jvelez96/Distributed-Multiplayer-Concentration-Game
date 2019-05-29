@@ -2,6 +2,7 @@
 
 PlayerList *client_list = NULL;
 int size;
+pthread_mutex_t **lock;
 
 int main(int argc, char* argv[]){
   int nplayers=0, j;
@@ -48,6 +49,13 @@ int main(int argc, char* argv[]){
   //Bind the address struct to the socket
   bind(serverSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
   //Listen on the socket, with 40 max connection requests queued
+
+  //Initializing mutex locks
+  lock = (pthread_mutex_t **)malloc (sizeof(pthread_mutex_t *) * size);
+  for(j=0;j<size;j++){
+    lock[j]= (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t *) * size);
+  }
+
   if(listen(serverSocket,50)==0)
     printf("Listening\n");
   else
@@ -82,7 +90,7 @@ int main(int argc, char* argv[]){
    }
 
    i++;
-    if( pthread_create(&tid[i], NULL, socketThread, (void *)&newSocket) != 0 ){
+    if( pthread_create(&tid[i], NULL, first_play_thread, (void *)&newSocket) != 0 ){
       printf("Failed to create thread\n");
     }
 

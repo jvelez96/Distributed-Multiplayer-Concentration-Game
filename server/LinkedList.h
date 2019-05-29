@@ -74,7 +74,7 @@ typedef void * Item;
  ******************************************************************************/
 typedef struct LinkedListStruct
 {
-  int player_number;
+  int player_id;
   int color[3];
   int socket;
   int status;
@@ -161,8 +161,9 @@ PlayerList* getNextNodeLinkedList(PlayerList* node);
  ******************************************************************************/
 //PlayerList* insertUnsortedLinkedList(PlayerList* next, Item this);
 
-PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_number ,int *colors, int status);
+PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_id ,int *colors, int status);
 
+PlayerList *get_last_player(PlayerList *head);
 
 
 /* End of: Protect multiple inclusions                              */
