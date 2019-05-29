@@ -5,6 +5,60 @@ char buffer[1024];
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 extern PlayerList *client_list;
 
+void read_buffer(char *buffer, int *color, struct play_response *play, char *status, int *buffer_type)
+{
+  int i;
+  const char delimiter[2] = ";";
+
+  *buffer_type = ASCII - buffer[0];
+
+  char *token = strtok(buffer,delimiter);
+
+  switch(*buffer_type)
+  {
+    case 0:
+      i = 0;
+
+      while(token != NULL)
+      {
+        if(i==1){*color = atoi(token);}
+        if(i==2){play->code = atoi(token);}
+        if(i==3){play->play1[0] = atoi(token);}
+        if(i==4){play->play1[1] = atoi(token);}
+        if(i==5){play->play2[0] = atoi(token);}
+        if(i==6){play->play2[1] = atoi(token);}
+        if(i==7){strcpy(play->str_play1,token);}
+        if(i==8){strcpy(play->str_play2,token);}
+        if(i==9){strcpy(status,token);}
+        token = strtok(NULL, delimiter);
+        i++;
+      }
+    break;
+  }
+
+}
+
+void write_buffer(char *buffer, int *color, struct play_response *play, char *status, int *buffer_type)
+{
+  sprintf(buffer,"%d;%d;%d;%d;%d;%d;%d;%s;%s;%s", *buffer_type, *color, play->code, play->play1[0], play->play1[1], play->play2[0], play->play2[1], play->str_play1, play->str_play2, status);
+}
+
+void send_board(int socket, int size){
+  int i;
+  int x, y;
+  char *buffer[BUFFERSIZE];
+
+  for(x=0;x<size;x++){
+    for(y=0;y<size;y++){
+      memset(buffer, 0, BUFFERSIZE);
+      i = linear_conv(x,y);
+      sprintf(buffer, "%d %d %s %d %d %d", x, y, board[i].v, board[i].color[0], board[i].color[1], board[i].color[2]);
+      send(socket, buffer, BUFFERSIZE, 0);
+      printf("sending buffer %s for cell x: %d y: %d of board i: %d\n",buffer, x,y,i);
+    }
+  }
+}
+
 int *get_colors(){
   static int colors[3];
 

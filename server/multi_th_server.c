@@ -71,14 +71,14 @@ int main(int argc, char* argv[]){
    client_list = insertLastLinkedList(client_list, newSocket, i/*, colors*/);
    printf("Acabou inserir lista\n");
 
-   memset(buffer, 0, 100); //erase buffer before inserting data
+   memset(buffer, 0, BUFFERSIZE); //erase buffer before inserting data
    sprintf(buffer, "%d %d %d %d", colors[0], colors[1], colors[2], size);
-   send(newSocket,buffer,100,0);
+   send(newSocket,buffer,BUFFERSIZE,0);
 
    printf("send buffer: %s\n", buffer);
    if(nplayers >= 2){
      //send board
-     //
+     send_board(newSocket, size);
    }
 
    i++;

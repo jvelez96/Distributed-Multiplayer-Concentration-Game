@@ -1,4 +1,5 @@
 #include "LinkedList.h"
+#define BUFFERSIZE 150
 
 typedef struct board_place{
   char v[3];
