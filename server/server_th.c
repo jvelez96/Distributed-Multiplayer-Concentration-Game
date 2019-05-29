@@ -50,13 +50,14 @@ void send_board(){
   int i;
   int x, y;
   char buffer[BUFFERSIZE];
-  PlayerList *curr = client_list;
+  PlayerList *curr;
 
   for(x=0;x<size;x++){
     for(y=0;y<size;y++){
       memset(buffer, 0, BUFFERSIZE);
       i = linear_conv(x,y);
       sprintf(buffer, "%d %d %s %d %d %d", x, y, board[i].v, board[i].color[0], board[i].color[1], board[i].color[2]);
+      curr = client_list;
       while(curr != NULL){
         //only sends board if the player has not received it yet
         if(curr->status == 0){
@@ -125,7 +126,7 @@ void * first_play_thread(void *socket)
     memset(buffer, 0, BUFFERSIZE);
     recv(newSocket, buffer, BUFFERSIZE,0);
 
-    if(strcmp(buffer, "exit")){
+    if(strcmp(buffer, "exit")== 0){
       //remove from list
       printf("player %d exited\n", player_info->player_id);
       close(newSocket);
