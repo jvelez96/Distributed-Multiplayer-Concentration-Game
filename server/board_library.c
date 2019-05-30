@@ -22,7 +22,8 @@ void init_board(int dim){
 
   dim_board= dim;
   n_corrects = 0;
-  play1[0]= -1;
+  for(i=0;i<MAXPLAYERS; i++)
+    play1[i][0]= -1;
   board = malloc(sizeof(board_place)* dim *dim);
 
   for( i=0; i < (dim_board*dim_board); i++){
@@ -59,57 +60,64 @@ void init_board(int dim){
   }
 }
 
-play_response board_play(int x, int y, int socket){
-  play_response resp;
-  resp.code =10;
-  if(strcmp(get_board_place_str(x, y), "")==0){
-    printf("FILLED\n");
-    resp.code =0;
-  }else{
-    if(play1[0]== -1){
-        printf("FIRST\n");
-        resp.code =1;
+play_response board_play(int x, int y, int socket, int status){
 
-        play1[0]=x;
-        play1[1]=y;
-        resp[socket].play1[0]= play1[0];
-        resp[socket].play1[1]= play1[1];
-        strcpy(resp[socket].str_play1, get_board_place_str(x, y));
-      }else{
-        char * first_str = get_board_place_str(play1[0], play1[1]);
-        char * secnd_str = get_board_place_str(x, y);
+  if(status == 1){
+    resp[socket].code =10;
+    if(strcmp(get_board_place_str(x, y), "")==0){
+      printf("FILLED\n");
+      resp[socket].code =0;
+    }else{
+      if(play1[socket][0]== -1){
+          printf("FIRST\n");
+          resp[socket].code =1;
 
-        if ((play1[0]==x) && (play1[1]==y)){
-          resp.code =0;
-          printf("FILLED\n");
-        } else{
-          resp[socket].play1[0]= play1[0];
-          resp[socket].play1[1]= play1[1];
-          strcpy(resp[socket].str_play1, first_str);
-          resp[socket].play2[0]= x;
-          resp[socket].play2[1]= y;
-          strcpy(resp[socket].str_play2, secnd_str);
+          play1[socket][0]=x;
+          play1[socket][1]=y;
+          resp[socket].play1[0]= play1[socket][0];
+          resp[socket].play1[1]= play1[socket][1];
+          strcpy(resp[socket].str_play1, get_board_place_str(x, y));
+        }else{
+          char * first_str = get_board_place_str(play1[socket][0], play1[socket][1]);
+          char * secnd_str = get_board_place_str(x, y);
 
-          if (strcmp(first_str, secnd_str) == 0){
-            printf("CORRECT!!!\n");
+          if ((play1[socket][0]==x) && (play1[socket][1]==y)){
+            resp[socket].code =0;
+            printf("FILLED\n");
+          } else{
+            resp[socket].play1[0]= play1[socket][0];
+            resp[socket].play1[1]= play1[socket][1];
+            strcpy(resp[socket].str_play1, first_str);
+            resp[socket].play2[0]= x;
+            resp[socket].play2[1]= y;
+            strcpy(resp[socket].str_play2, secnd_str);
+
+            if (strcmp(first_str, secnd_str) == 0){
+              printf("CORRECT!!!\n");
 
 
-            strcpy(first_str, "");
-            strcpy(secnd_str, "");
+              strcpy(first_str, "");
+              strcpy(secnd_str, "");
 
-            n_corrects +=2;
-            if (n_corrects == dim_board* dim_board)
-                resp[socket].code =3;
-            else
-              resp[socket].code =2;
-          }else{
-            printf("INCORRECT");
+              n_corrects +=2;
+              if (n_corrects == dim_board* dim_board)
+                  resp[socket].code =3;
+              else
+                resp[socket].code =2;
+            }else{
+              printf("INCORRECT");
 
-            resp[socket].code = -2;
+              resp[socket].code = -2;
+            }
+            play1[socket][0]= -1;
           }
-          play1[0]= -1;
         }
       }
-    }
-  return resp;
+  }else if(status == -1){
+    /* play cancelled due to timeout */
+    resp[socket].code = 0;
+    play1[socket][0] = -1;
+    play1[socket][1] = -1;
+  }
+  return resp[socket];
 }
