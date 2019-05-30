@@ -71,20 +71,70 @@ void start_ui()
 	// write_card(board_x, board_y, xx, color_r, color_g, color_b);
 // }
 
+void get_board(int dim)
+{
+		char buffer[BUFFER_SIZE];
+		int i,j;
+		int aux_x, aux_y;
+    char xx[3];
+    int color[3];
+
+    for(i = 1; i <= pow(dim,2); i++)
+		{
+
+				memset(buffer, 0, BUFFER_SIZE);
+				recv(sockfd, buff, sizeof(buff), 0);
+				sscanf(buff, "%d %d %s %d %d %d", &aux_x, &aux_y, xx, &color[0], &color[1], &color[2]);
+				paint_card(aux_x, aux_y, color[0], color[1], color[2]);
+				write_card(aux_x, aux_y, xx, color[0], color[1], color[2]);
+		}
+}
+
+void *manage_sdlEvents()
+{
+    int finished = 0;
+    SDL_Event event;
+    char buffer[BUFFER_SIZE];
+
+    while (!finished)
+    {
+        while (SDL_PollEvent(&event))
+        {
+					switch (event.type)
+					{
+						case SDL_QUIT:
+						{
+							done = SDL_TRUE;
+							break;
+						}
+
+						case SDL_MOUSEBUTTONDOWN:
+						{
+								int x,y;
+								get_board_card(event.button.x, event.button.y, &x, &y);
+						}
+
+					}
+				}
+
+		}
+
+}
+
 int main(){
 
 	//Create session with the server
 	int sockfd;
-    	struct sockaddr_in servaddr, cli;
+  struct sockaddr_in servaddr, cli;
 	char buff[MAX];
+	pthread_t events_thread;
 
 	int done = 0;
 	SDL_Event event;
 
 	//Player and board constants
 	int dim, color_0, color_1, color_2;
-	int color_r, color_g, color_b;
-	int code, board_x, board_y, aux_x, aux_y;
+	int code, board_x, board_y;
 	char xx [3];
 
 	sockfd = create_socket( "127.0.0.1", 8080 );
@@ -95,22 +145,28 @@ int main(){
 	sscanf(buff, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
 	printf("first information (%d,%d,%d,%d)\n", color_0, color_1, color_2, dim);
 
-	bzero(buff, MAX);
+	/*bzero(buff, MAX);
 	recv(sockfd, buff, sizeof(buff), 0);
 	printf("received buffer %s\n", buff);
 	sscanf(buff, "%d %d %c%c %d %d %d", &aux_x, &aux_y, &xx[0], &xx[1], &color_r, &color_g, &color_b);
-	printf("Lido: %d %d %c%c %d %d %d\n", aux_x, aux_y, xx[0], xx[1], color_r, color_g, color_b);
+	printf("Lido: %d %d %c%c %d %d %d\n", aux_x, aux_y, xx[0], xx[1], color_r, color_g, color_b);*/
+
 
 	xx[2] = '\0';
 
 	create_board_window(300, 300,  dim);
 
-	paint_card(aux_x, aux_y, color_r, color_g, color_b);
-	write_card(aux_x, aux_y, xx, color_r, color_g, color_b);
+	get_board(dim);
 
-	exit(0);
+	pthread_create(&events_thread, NULL, manage_sdlEvents, NULL);
+	//paint_card(aux_x, aux_y, color_r, color_g, color_b);
+	//write_card(aux_x, aux_y, xx, color_r, color_g, color_b);
 
-	while (!done){
+	//exit(0);
+
+
+
+	/*while (!done){
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_QUIT: {
@@ -166,7 +222,7 @@ int main(){
 				}
 			}
 		}
-	}
+	}*/
 	printf("fim\n");
 	close_board_windows();
 }
