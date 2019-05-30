@@ -4,8 +4,9 @@ extern pthread_mutex_t lock;
 extern PlayerList *client_list;
 extern int size;
 extern board_place * board;
-extern int play1[2];
 extern int n_corrects;
+extern int play1[MAXPLAYERS][2];
+extern play_response resp[MAXPLAYERS];
 
 void update_color(int x, int y, int *color){
   int i;
@@ -17,7 +18,7 @@ void update_color(int x, int y, int *color){
   return;
 }
 
-void broadcast_play(void *buffer){
+void * broadcast_play(void *buffer){
   PlayerList *curr;
 
   curr = client_list;
@@ -30,7 +31,7 @@ void broadcast_play(void *buffer){
 }
 
 
-void read_secondplay_buffer(void *socket){
+void * read_secondplay_buffer(void *socket){
   int newSocket = *((int*)socket);
   int x,y;
   fd_set rfds;
@@ -61,13 +62,13 @@ void read_secondplay_buffer(void *socket){
 
      if(strcmp(buffer, "exit")== 0){
        printf("player with socket %d exited\n", newSocket);
-       resp[socket].code = -1;
+       resp[newSocket].code = -1;
        pthread_exit(NULL);
      } else{
        sscanf(buffer, "%d %d", &x, &y);
        //pthread_mutex_lock(&lock[x][y]);
-       resp[socket] = board_play(x, y, newSocket, OKAY);
-       printf("2nd play code: %d\n", resp[socket].code);
+       resp[newSocket] = board_play(x, y, newSocket, OKAY);
+       printf("2nd play code: %d\n", resp[newSocket].code);
 
        /*
           unlock mutex if code=0
@@ -83,12 +84,11 @@ void read_secondplay_buffer(void *socket){
   pthread_exit(NULL);
 }
 
-void read_firstplay_buffer(char *buffer, int socket, int *done, PlayerList *player)
+void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 {
-  int i;
-  char first_play[3];
+  //char first_play[3];
+  int x,y;
   pthread_t tid;
-  char buffer[BUFFERSIZE];
 
   if(strcmp(buffer, "exit")== 0){
     //remove from list
@@ -101,34 +101,47 @@ void read_firstplay_buffer(char *buffer, int socket, int *done, PlayerList *play
 
   //pthread_mutex_lock(&lock[x][y]);
   resp[socket] = board_play(x,y,socket, OKAY);
-  printf("play response:\ncode %d\n", resp[socket]->code);
+  printf("play response:\ncode %d\n", resp[socket].code);
 
-  if(resp[socket] == 0){
+  if(resp[socket].code == 0){
     /* filled position */
     //pthread_mutex_unlock(&lock[x][y]);
-  }else if(resp[socket]==1){
+  }else if(resp[socket].code == 1){
     /* valid first play */
     //fill the position
-    resp[socket] = 0;
+    resp[socket].code = 0;
     update_color(x,y, player->color);
 
     //broadcast play to all Players
+    memset(buffer, 0, BUFFERSIZE);
     sprintf(buffer, "%d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
     pthread_create(&tid, NULL, broadcast_play, (void*)buffer);
     pthread_join(tid, NULL);
 
     //pthread_mutex_unlock(&lock[x][y]);
 
-    first_play[0] = resp[socket].str_play1[0];
-    first_play[1] = resp[socket].str_play1[1];
-    first_play[2] = resp[socket].str_play1[2];
+    /*
+    for(int i=0; i<3; i++)
+      first_play[i] = resp[socket].str_play1[i];*/
 
     //create thread to read the second play
-    pthread_create(&tid, NULL, read_secondplay_buffer, (void*)socket);
+    pthread_create(&tid, NULL, read_secondplay_buffer, (void*)&socket);
     pthread_join(tid, NULL);
 
     switch (resp[socket].code) {
-      case :
+      /* exit in second play */
+      case -1:
+        *done = 1;
+        // remove player from list
+      break;
+      case -2:
+        // different cards
+      break;
+      case 0:
+        // place filled
+      break;
+      case 2:
+        // correct cards
       break;
     }
   }
@@ -195,7 +208,6 @@ void print_linked_list(PlayerList *head){
 void * first_play_thread(void *socket)
 {
   int done = 0;
-  int read_status;
   int newSocket = *((int*)socket);
   char buffer[BUFFERSIZE];
   PlayerList *player_info;
@@ -215,9 +227,7 @@ void * first_play_thread(void *socket)
     memset(buffer, 0, BUFFERSIZE);
     recv(newSocket, buffer, BUFFERSIZE,0);
 
-    read_status = read_play_buffer(buffer, newSocket, &done);
-
-
+    manage_player(buffer, newSocket, &done, player_info);
 
   }
 

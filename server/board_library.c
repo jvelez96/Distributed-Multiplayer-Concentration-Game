@@ -22,7 +22,8 @@ void init_board(int dim){
 
   dim_board= dim;
   n_corrects = 0;
-  play1[0]= -1;
+  for(i=0;i<MAXPLAYERS; i++)
+    play1[i][0]= -1;
   board = malloc(sizeof(board_place)* dim *dim);
 
   for( i=0; i < (dim_board*dim_board); i++){
@@ -67,7 +68,7 @@ play_response board_play(int x, int y, int socket, int status){
       printf("FILLED\n");
       resp[socket].code =0;
     }else{
-      if(play1[0]== -1){
+      if(play1[socket][0]== -1){
           printf("FIRST\n");
           resp[socket].code =1;
 
@@ -118,6 +119,5 @@ play_response board_play(int x, int y, int socket, int status){
     play1[socket][0] = -1;
     play1[socket][1] = -1;
   }
-
-  return resp;
+  return resp[socket];
 }
