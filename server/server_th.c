@@ -29,6 +29,10 @@ void broadcast_play(void *buffer){
   pthread_exit(NULL);
 }
 
+void read_secondplay_buffer(void *socket){
+  
+}
+
 void read_firstplay_buffer(char *buffer, int socket, int *done, PlayerList *player)
 {
   int i;
@@ -73,7 +77,7 @@ void read_firstplay_buffer(char *buffer, int socket, int *done, PlayerList *play
     pthread_create(&tid, NULL, read_secondplay_buffer, (void*)socket);
     pthread_join(tid, NULL);
 
-    
+
 
   }
 }
