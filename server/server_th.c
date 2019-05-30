@@ -7,41 +7,79 @@ extern board_place * board;
 extern int play1[2];
 extern int n_corrects;
 
-void read_buffer(char *buffer, int *color, struct play_response *play, char *status, int *buffer_type)
+void update_color(int x, int y, int *color){
+  int i;
+  i = linear_conv(x,y);
+  board[i].color[0] = color[0];
+  board[i].color[1] = color[1];
+  board[i].color[2] = color[2];
+
+  return;
+}
+
+void broadcast_play(void *buffer){
+  PlayerList *curr;
+
+  curr = client_list;
+
+  while(curr != NULL){
+    send(curr->socket, (char*) buffer, BUFFERSIZE,0);
+    curr = curr->next;
+  }
+  pthread_exit(NULL);
+}
+
+void read_secondplay_buffer(void *socket){
+  
+}
+
+void read_firstplay_buffer(char *buffer, int socket, int *done, PlayerList *player)
 {
   int i;
-  const char delimiter[2] = ";";
+  char first_play[3];
+  pthread_t tid;
+  char buffer[BUFFERSIZE];
 
-  *buffer_type = ASCII - buffer[0];
-
-  char *token = strtok(buffer,delimiter);
-
-  switch(*buffer_type)
-  {
-    /* receiving play */
-    case 0:
-      i = 0;
-
-      while(token != NULL)
-      {
-        if(i==1){*color = atoi(token);}
-        if(i==2){play->code = atoi(token);}
-        if(i==3){play->play1[0] = atoi(token);}
-        if(i==4){play->play1[1] = atoi(token);}
-        if(i==5){play->play2[0] = atoi(token);}
-        if(i==6){play->play2[1] = atoi(token);}
-        if(i==7){strcpy(play->str_play1,token);}
-        if(i==8){strcpy(play->str_play2,token);}
-        if(i==9){strcpy(status,token);}
-        token = strtok(NULL, delimiter);
-        i++;
-      }
-    break;
-    /* player exiting */
-    case 3:
-    break;
+  if(strcmp(buffer, "exit")== 0){
+    //remove from list
+    printf("player with socket %d exited\n", socket);
+    *done = 1;
+    return;
   }
 
+  sscanf(buffer, "%d %d", &x, &y);
+
+  //pthread_mutex_lock(&lock[x][y]);
+  resp[socket] = board_play(x,y,socket);
+  printf("play response:\ncode %d\n", resp[socket]->code);
+
+  if(resp[socket] == 0){
+    /* filled position */
+    //pthread_mutex_unlock(&lock[x][y]);
+  }else if(resp[socket]==1){
+    /* valid first play */
+    //fill the position
+    resp[socket] = 0;
+    update_color(x,y, player->color);
+
+    //broadcast play to all Players
+    sprintf(buffer, "%d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
+    pthread_create(&tid, NULL, broadcast_play, (void*)buffer);
+    pthread_join(tid, NULL);
+
+    //pthread_mutex_unlock(&lock[x][y]);
+
+    first_play[0] = resp[socket].str_play1[0];
+    first_play[1] = resp[socket].str_play1[1];
+    first_play[2] = resp[socket].str_play1[2];
+
+    //create thread to read the second play
+    pthread_create(&tid, NULL, read_secondplay_buffer, (void*)socket);
+    pthread_join(tid, NULL);
+
+
+
+  }
 }
 
 void write_buffer(char *buffer, int *color, struct play_response *play, char *status, int *buffer_type)
@@ -105,6 +143,7 @@ void print_linked_list(PlayerList *head){
 void * first_play_thread(void *socket)
 {
   int done = 0;
+  int read_status;
   int newSocket = *((int*)socket);
   char buffer[BUFFERSIZE];
   PlayerList *player_info;
@@ -124,14 +163,8 @@ void * first_play_thread(void *socket)
     memset(buffer, 0, BUFFERSIZE);
     recv(newSocket, buffer, BUFFERSIZE,0);
 
-    /*
-    if(strcmp(buffer, "exit")== 0){
-      //remove from list
-      printf("player %d exited\n", player_info->player_id);
-      close(newSocket);
-      done = 1;
-    }
-    */
+    read_status = read_play_buffer(buffer, newSocket, &done);
+
 
 
   }

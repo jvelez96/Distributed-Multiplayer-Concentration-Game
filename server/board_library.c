@@ -3,7 +3,8 @@
 
 int dim_board;
 board_place * board;
-int play1[2];
+int play1[MAXPLAYERS][2];
+play_response resp[MAXPLAYERS];
 int n_corrects;
 
 int linear_conv(int i, int j){
@@ -58,7 +59,7 @@ void init_board(int dim){
   }
 }
 
-play_response board_play(int x, int y){
+play_response board_play(int x, int y, int socket){
   play_response resp;
   resp.code =10;
   if(strcmp(get_board_place_str(x, y), "")==0){
@@ -71,9 +72,9 @@ play_response board_play(int x, int y){
 
         play1[0]=x;
         play1[1]=y;
-        resp.play1[0]= play1[0];
-        resp.play1[1]= play1[1];
-        strcpy(resp.str_play1, get_board_place_str(x, y));
+        resp[socket].play1[0]= play1[0];
+        resp[socket].play1[1]= play1[1];
+        strcpy(resp[socket].str_play1, get_board_place_str(x, y));
       }else{
         char * first_str = get_board_place_str(play1[0], play1[1]);
         char * secnd_str = get_board_place_str(x, y);
@@ -82,12 +83,12 @@ play_response board_play(int x, int y){
           resp.code =0;
           printf("FILLED\n");
         } else{
-          resp.play1[0]= play1[0];
-          resp.play1[1]= play1[1];
-          strcpy(resp.str_play1, first_str);
-          resp.play2[0]= x;
-          resp.play2[1]= y;
-          strcpy(resp.str_play2, secnd_str);
+          resp[socket].play1[0]= play1[0];
+          resp[socket].play1[1]= play1[1];
+          strcpy(resp[socket].str_play1, first_str);
+          resp[socket].play2[0]= x;
+          resp[socket].play2[1]= y;
+          strcpy(resp[socket].str_play2, secnd_str);
 
           if (strcmp(first_str, secnd_str) == 0){
             printf("CORRECT!!!\n");
@@ -98,13 +99,13 @@ play_response board_play(int x, int y){
 
             n_corrects +=2;
             if (n_corrects == dim_board* dim_board)
-                resp.code =3;
+                resp[socket].code =3;
             else
-              resp.code =2;
+              resp[socket].code =2;
           }else{
             printf("INCORRECT");
 
-            resp.code = -2;
+            resp[socket].code = -2;
           }
           play1[0]= -1;
         }
