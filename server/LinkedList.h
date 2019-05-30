@@ -62,6 +62,7 @@
 #define ASCII 48
 #define BUFFERSIZE 150
 #define COLORNR 255
+#define MAXPLAYERS 50
 
 typedef void * Item;
 

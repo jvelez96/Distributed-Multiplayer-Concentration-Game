@@ -19,5 +19,5 @@ typedef struct play_response{
 
 char * get_board_place_str(int i, int j);
 void init_board(int dim);
-play_response board_play (int x, int y);
+play_response board_play (int x, int y, int socket);
 int linear_conv(int i, int j);
