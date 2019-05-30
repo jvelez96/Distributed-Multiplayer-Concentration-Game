@@ -12,6 +12,7 @@ typedef struct play_response{
             // 2 2nd - same plays
             // 3 END
             // -2 2nd - diffrent
+            //-1 Exit in 2nd play
   int play1[2];
   int play2[2];
   char str_play1[3], str_play2[3];
@@ -19,5 +20,5 @@ typedef struct play_response{
 
 char * get_board_place_str(int i, int j);
 void init_board(int dim);
-play_response board_play (int x, int y, int socket);
+play_response board_play (int x, int y, int socket, int status);
 int linear_conv(int i, int j);

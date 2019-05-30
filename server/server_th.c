@@ -29,8 +29,58 @@ void broadcast_play(void *buffer){
   pthread_exit(NULL);
 }
 
+
 void read_secondplay_buffer(void *socket){
-  
+  int newSocket = *((int*)socket);
+  int x,y;
+  fd_set rfds;
+  struct timeval tv;
+  int retval;
+  char buffer[BUFFERSIZE];
+
+  /* Watch stdin (socket) to see when it has input. */
+
+  FD_ZERO(&rfds);
+  FD_SET(newSocket, &rfds);
+
+  /* Wait up to five seconds. */
+
+  tv.tv_sec = 5;
+  tv.tv_usec = 0;
+
+  retval = select(newSocket+1, &rfds, NULL, NULL, &tv);
+  /* Don't rely on the value of tv now! */
+
+  if (retval == -1)
+     perror("select()");
+  else if (retval){
+     printf("Data is available now.\n");
+     /* FD_ISSET(socket, &rfds) will be true. */
+     recv(newSocket, buffer, BUFFERSIZE, 0);
+     printf("2nd play buffer:\n%s\n", buffer);
+
+     if(strcmp(buffer, "exit")== 0){
+       printf("player with socket %d exited\n", newSocket);
+       resp[socket].code = -1;
+       pthread_exit(NULL);
+     } else{
+       sscanf(buffer, "%d %d", &x, &y);
+       //pthread_mutex_lock(&lock[x][y]);
+       resp[socket] = board_play(x, y, newSocket, OKAY);
+       printf("2nd play code: %d\n", resp[socket].code);
+
+       /*
+          unlock mutex if code=0
+       */
+     }
+  }
+  else{
+    printf("No data within five seconds.\n");
+    resp[newSocket] = board_play(0,0,newSocket, CANCEL);
+  }
+
+  printf("finished reading 2nd play\n");
+  pthread_exit(NULL);
 }
 
 void read_firstplay_buffer(char *buffer, int socket, int *done, PlayerList *player)
@@ -50,7 +100,7 @@ void read_firstplay_buffer(char *buffer, int socket, int *done, PlayerList *play
   sscanf(buffer, "%d %d", &x, &y);
 
   //pthread_mutex_lock(&lock[x][y]);
-  resp[socket] = board_play(x,y,socket);
+  resp[socket] = board_play(x,y,socket, OKAY);
   printf("play response:\ncode %d\n", resp[socket]->code);
 
   if(resp[socket] == 0){
@@ -77,8 +127,10 @@ void read_firstplay_buffer(char *buffer, int socket, int *done, PlayerList *play
     pthread_create(&tid, NULL, read_secondplay_buffer, (void*)socket);
     pthread_join(tid, NULL);
 
-
-
+    switch (resp[socket].code) {
+      case :
+      break;
+    }
   }
 }
 

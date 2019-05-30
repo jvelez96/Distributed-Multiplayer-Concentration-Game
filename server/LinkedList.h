@@ -63,6 +63,8 @@
 #define BUFFERSIZE 150
 #define COLORNR 255
 #define MAXPLAYERS 50
+#define CANCEL -1
+#define OKAY 1
 
 typedef void * Item;
 
