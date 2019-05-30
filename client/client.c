@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+
 #include "UI_library.h"
 
 int create_socket( char * ip, int port )
@@ -71,9 +72,9 @@ void start_ui()
 	// write_card(board_x, board_y, xx, color_r, color_g, color_b);
 // }
 
-void get_board(int dim)
+void get_board(int dim, int sockfd)
 {
-		char buffer[BUFFER_SIZE];
+		char buffer[MAX];
 		int i,j;
 		int aux_x, aux_y;
     char xx[3];
@@ -82,7 +83,7 @@ void get_board(int dim)
     for(i = 1; i <= pow(dim,2); i++)
 		{
 
-				memset(buffer, 0, BUFFER_SIZE);
+				memset(buffer, 0, MAX);
 				recv(sockfd, buff, sizeof(buff), 0);
 				sscanf(buff, "%d %d %s %d %d %d", &aux_x, &aux_y, xx, &color[0], &color[1], &color[2]);
 				paint_card(aux_x, aux_y, color[0], color[1], color[2]);
@@ -90,11 +91,11 @@ void get_board(int dim)
 		}
 }
 
-void *manage_sdlEvents()
+void *manage_sdlEvents(int sockfd)
 {
     int finished = 0;
     SDL_Event event;
-    char buffer[BUFFER_SIZE];
+    char buffer[MAX];
 
     while (!finished)
     {
@@ -104,6 +105,9 @@ void *manage_sdlEvents()
 					{
 						case SDL_QUIT:
 						{
+							memset(buffer,0,MAX);
+							sprintf(buffer, "exit");
+							send(sockfd, buff, sizeof(buff), 0);
 							done = SDL_TRUE;
 							break;
 						}
@@ -112,13 +116,64 @@ void *manage_sdlEvents()
 						{
 								int x,y;
 								get_board_card(event.button.x, event.button.y, &x, &y);
+								memset(buffer,0,MAX);
+								sprintf(buffer, "%d %d", x, y);
+								send(sockfd, buff, sizeof(buff), 0);
+
 						}
 
 					}
 				}
 
 		}
+		pthread_exit(NULL);
 
+
+}
+
+
+void *play(int sockfd)
+{
+	char buffer[MAX];
+	int finished = 0;
+
+	while (!finished)
+	{
+		memset(buffer, 0, MAX);
+		n = read(sockfd, buffer, MAX);
+
+		switch (code)
+		{
+			case 1:
+				strcpy(aux1,aux);
+				paint_card(board_x, board_y, color_0, color_1, color_2);
+				write_card(board_x, board_y, aux1, 200, 200, 200);
+				aux_x = board_x;
+				aux_y = board_y;
+				break;
+
+			case 2:
+					paint_card(aux_x, aux_y, color_0, color_1, color_2);
+					write_card(aux_x, aux_y, aux1, 0, 0, 0);
+					paint_card(board_x, board_y , color_0, color_1, color_2);
+					write_card(board_x, board_y, aux, 0, 0, 0);
+					break;
+
+			case 3:
+				done = 1;
+
+			case -2:
+				paint_card(aux_x, aux_y, color_0, color_1, color_2);
+				write_card(aux_x, aux_y, aux1, 255, 0, 0);
+				paint_card(board_x, board_y , color_0, color_1, color_2);
+				write_card(board_x, board_y, aux, 255, 0, 0);
+				sleep(2);
+				paint_card(aux_x, aux_y , 255, 255, 255);
+				paint_card(board_x, board_y, 255, 255, 255);
+				break;
+		}
+
+	}
 }
 
 int main(){
@@ -137,7 +192,7 @@ int main(){
 	int code, board_x, board_y;
 	char xx [3];
 
-	sockfd = create_socket( "127.0.0.1", 8080 );
+	sockfd = create_socket( "127.0.0.1", PORT );
 	start_ui();
 
 	bzero(buff, MAX);
@@ -156,9 +211,11 @@ int main(){
 
 	create_board_window(300, 300,  dim);
 
-	get_board(dim);
+	get_board(dim,sockfd);
 
 	pthread_create(&events_thread, NULL, manage_sdlEvents, NULL);
+
+	play(sockfd);
 	//paint_card(aux_x, aux_y, color_r, color_g, color_b);
 	//write_card(aux_x, aux_y, xx, color_r, color_g, color_b);
 
