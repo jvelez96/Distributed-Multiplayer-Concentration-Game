@@ -18,6 +18,7 @@ void read_buffer(char *buffer, int *color, struct play_response *play, char *sta
 
   switch(*buffer_type)
   {
+    /* receiving play */
     case 0:
       i = 0;
 
@@ -35,6 +36,9 @@ void read_buffer(char *buffer, int *color, struct play_response *play, char *sta
         token = strtok(NULL, delimiter);
         i++;
       }
+    break;
+    /* player exiting */
+    case 3:
     break;
   }
 
@@ -120,12 +124,16 @@ void * first_play_thread(void *socket)
     memset(buffer, 0, BUFFERSIZE);
     recv(newSocket, buffer, BUFFERSIZE,0);
 
+    /*
     if(strcmp(buffer, "exit")== 0){
       //remove from list
       printf("player %d exited\n", player_info->player_id);
       close(newSocket);
       done = 1;
     }
+    */
+
+
   }
 
   close(newSocket);
