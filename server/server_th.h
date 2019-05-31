@@ -6,7 +6,7 @@ struct args {
 };
 
 void update_color(int x, int y, int *color);
-void * broadcast_play(void *args);
+void * broadcast_play(void *sock);
 void manage_player(char *buffer, int socket, int *done, PlayerList *player);
 void * read_secondplay_buffer(void *socket);
 int *get_colors();

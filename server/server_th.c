@@ -8,6 +8,7 @@ extern int n_corrects;
 extern int play1[MAXPLAYERS][2];
 extern play_response resp[MAXPLAYERS];
 extern int nplayers;
+char broadcast_buf[BUFFERSIZE];
 
 void update_color(int x, int y, int *color){
   int i;
@@ -19,16 +20,16 @@ void update_color(int x, int y, int *color){
   return;
 }
 
-void * broadcast_play(void *args){
+void * broadcast_play(void *sock){
   /*
   while(curr != NULL){
     send(curr->socket, (char*) buffer, BUFFERSIZE,0);
     curr = curr->next;
   }
   */
-  int socket = ((struct args*)args)->socket;
+  int socket = *((int*)sock;
   char buffer[BUFFERSIZE] = {'\0'};
-  strcpy(buffer, ((struct args*)args)->buff);
+  strcpy(buffer, broadcast_buf);
 
   printf("sending buffer: %s\nto %d\n", buffer,socket);
   send(socket, (char*) buffer, sizeof(buffer),0);
@@ -96,17 +97,18 @@ void * read_secondplay_buffer(void *socket){
   pthread_exit(NULL);
 }
 
-void broadcast(struct args *broadcast_args){
+void broadcast(){
   PlayerList *curr = client_list;
   int i= 0;
   int j;
   pthread_t tids[MAXPLAYERS];
+  int socket;
 
   // verificar se esta a receber bem os args
   while(curr != NULL){
     //send(curr->socket, (char*) buffer, BUFFERSIZE,0);
-    broadcast_args->socket = curr->socket;
-    pthread_create(&tids[i], NULL, broadcast_play, (void*)broadcast_args);
+    socket = curr->socket;
+    pthread_create(&tids[i], NULL, broadcast_play, (void*) &socket);
     curr = curr->next;
     i++;
   }
@@ -128,6 +130,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     printf("player with socket %d exited\n", socket);
     nplayers--;
     *done = 1;
+    pthread_exit(NULL);
     return;
   }
 
@@ -148,14 +151,14 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     update_color(x,y, player->color);
 
     //broadcast play to all Players
-    memset(broadcast_args->buff, 0, BUFFERSIZE);
-    sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
+    memset(broadcast_buf, 0, BUFFERSIZE);
+    sprintf(broadcast_buf, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
 
     paint_card(x, y, player->color[0], player->color[1], player->color[2]);
     write_card(x, y, resp[socket].str_play1, COLORNR, COLORNR, COLORNR);
 
 
-    broadcast(broadcast_args);
+    broadcast();
     /*
     curr = client_list;
     while(curr != NULL){
@@ -182,7 +185,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     pthread_join(tid, NULL);
 
     //broadcast_args->buff[BUFFERSIZE] ={'\0'};
-    memset(broadcast_args->buff, 0, BUFFERSIZE);
+    memset(broadcast_buff, 0, BUFFERSIZE);
     switch (resp[socket].code) {
       /* exit in second play */
       case -1:
@@ -197,9 +200,9 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         paint_card(resp[socket].play1[0], resp[socket].play1[1], COLORNR, COLORNR, COLORNR);
         write_card(resp[socket].play1[0], resp[socket].play1[1], resp[socket].str_play1, COLORNR, COLORNR, COLORNR);
 
-        sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
+        sprintf(broadcast_buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
 
-        broadcast(broadcast_args);
+        broadcast();
 
 
       break;
@@ -209,7 +212,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 
         //broadcast play to all Players 2nd play
         //memset(broadcast_args->buff, 0, BUFFERSIZE);
-        sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d",resp[socket].play2[0] , resp[socket].play2[1], resp[socket].str_play2, player->color[0], player->color[1], player->color[2]);
+        sprintf(broadcast_buff, "1 %d %d %s %d %d %d",resp[socket].play2[0] , resp[socket].play2[1], resp[socket].str_play2, player->color[0], player->color[1], player->color[2]);
         //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
 
         write_card(resp[socket].play1[0], resp[socket].play1[1], resp[socket].str_play2, 255, 0, 0);
@@ -217,27 +220,29 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         paint_card(resp[socket].play2[0], resp[socket].play2[1], player->color[0], player->color[1],player->color[2]);
         write_card(resp[socket].play2[0], resp[socket].play2[1], resp[socket].str_play2, 255, 0, 0);
 
-        broadcast(broadcast_args);
+        broadcast();
 
         sleep(2);
 
         //broadcast play to all Players cards down
         //memset(broadcast_args->buff, 0, BUFFERSIZE);
-        sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play2[0], resp[socket].play2[1]);
+        memset(broadcast_buff, 0, BUFFERSIZE);
+        sprintf(broadcast_buff, "0 %d %d 255 255 255", resp[socket].play2[0], resp[socket].play2[1]);
 
         paint_card(resp[socket].play2[0], resp[socket].play2[1], COLORNR, COLORNR, COLORNR);
         write_card(resp[socket].play2[0], resp[socket].play2[1], resp[socket].str_play2, COLORNR, COLORNR, COLORNR);
 
         paint_card(resp[socket].play1[0], resp[socket].play1[1], COLORNR, COLORNR, COLORNR);
-        write_card(resp[socket].play1[0], resp[socket].play1[1], resp[socket].str_play2, COLORNR, COLORNR, COLORNR);
+        write_card(resp[socket].play1[0], resp[socket].play1[1], resp[socket].str_play1, COLORNR, COLORNR, COLORNR);
 
-        broadcast(broadcast_args);
+        broadcast();
 
         //broadcast play to all Players
         //memset(broadcast_args->buff, 0, BUFFERSIZE);
+        memset(broadcast_buff, 0, BUFFERSIZE);
         sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
 
-        broadcast(broadcast_args);
+        broadcast();
 
 
 
@@ -248,9 +253,9 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 
         //broadcast play to all Players
         //memset(broadcast_args->buff, 0, BUFFERSIZE);
-        sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
+        sprintf(broadcast_buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
 
-        broadcast(broadcast_args);
+        broadcast();
 
       break;
       case 2:
@@ -258,17 +263,17 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 
         //broadcast play to all Players
         //memset(broadcast_args->buff, 0, BUFFERSIZE);
-        sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
+        sprintf(broadcast_buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
 
-        broadcast(broadcast_args);
+        broadcast();
         //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
       break;
       case 3:
         //broadcast play to all Players
         //memset(broadcast_args->buff, 0, BUFFERSIZE);
-        sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
+        sprintf(broadcast_buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
 
-        broadcast(broadcast_args);
+        broadcast();
         //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
       break;
     }
