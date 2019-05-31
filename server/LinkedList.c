@@ -205,3 +205,28 @@ PlayerList *get_last_player(PlayerList *head){
   printf("returning player %d\n\n", curr->player_id);
   return curr;
 }
+
+PlayerList *remove_player(PlayerList *head, int player_id){
+  PlayerList *curr, *aux;
+
+  curr = head;
+
+  while(curr != NULL){
+    if(player_id == curr->player_id){
+      if(curr == head){
+        head = head->next;
+        free(curr);
+        return head;
+      }else{
+        aux = head;
+        while(aux->next->player_id != player_id || aux->next != NULL){
+          aux = aux->next;
+        }
+        aux->next = curr->next;
+        free(curr);
+      }
+    }
+    curr = curr->next;
+  }
+  return head;
+}
