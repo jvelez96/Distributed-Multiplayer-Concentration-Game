@@ -166,7 +166,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 
 
     broadcast();
-    pthread_mutex_unlock(&lock[x][y]);
+    pthread_mutex_unlock(&lock[resp[socket].play1[0]][resp[socket].play1[1]]);
     /*
     curr = client_list;
     while(curr != NULL){
