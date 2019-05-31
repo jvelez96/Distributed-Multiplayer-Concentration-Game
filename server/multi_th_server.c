@@ -74,7 +74,7 @@ int main(int argc, char* argv[]){
 
   lock = (pthread_mutex_t **)malloc (sizeof(pthread_mutex_t *) * size);
   for(j=0;j<size;j++){
-    lock[j]= (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+    lock[j]= (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)*size);
   }
 
 
