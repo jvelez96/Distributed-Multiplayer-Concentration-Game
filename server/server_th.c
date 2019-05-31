@@ -127,6 +127,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 {
   int x,y;
   pthread_t tid;
+  int max_points = 0;
   //struct args *broadcast_args = (struct args *)malloc(sizeof(struct args));
   //struct args *broadcast_args;
 
@@ -226,6 +227,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         sprintf(broadcast_buf, "1 %d %d %s %d %d %d",resp[socket].play2[0] , resp[socket].play2[1], resp[socket].str_play2, player->color[0], player->color[1], player->color[2]);
 
         paint_card(resp[socket].play2[0], resp[socket].play2[1], player->color[0], player->color[1],player->color[2]);
+        write_card(resp[socket].play1[0], resp[socket].play1[1], resp[socket].str_play1, 255, 0, 0);
         write_card(resp[socket].play2[0], resp[socket].play2[1], resp[socket].str_play2, 255, 0, 0);
 
         broadcast();
@@ -271,7 +273,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
       break;
       case 2:
         // correct cards
-
+        player->points ++;
         //broadcast play to all Players
         //memset(broadcast_args->buff, 0, BUFFERSIZE);
         paint_card(resp[socket].play2[0], resp[socket].play2[1], player->color[0], player->color[1], player->color[2]);
@@ -289,6 +291,34 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         broadcast();
         //
         pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
+
+        player->points++;
+
+        PlayerList *aux = client_list;
+
+        memset(broadcast_buf,0, BUFFERSIZE);
+        strcpy(broadcast_buf, "2 ");
+
+        while(aux != NULL){
+          if(max_points <= aux->points){
+            max_points = aux->points;
+          }
+          aux = aux->next;
+        }
+        aux = client_list;
+
+        char str[5];
+
+        while(aux != NULL){
+          if(max_points == aux->points){
+            memset(str, 0, 5);
+            sprintf(str, " %d", aux->player_id);
+            strcat(broadcast_buf, str);
+          }
+          aux = aux->next;
+        }
+        printf("%s\n", broadcast_buf);
+        broadcast();
       break;
     }
   }

@@ -97,7 +97,7 @@ int main(int argc, char* argv[]){
     colors = get_colors();
 
    nplayers++;
-   client_list = insertLastLinkedList(client_list, newSocket, i, colors, 0);
+   client_list = insertLastLinkedList(client_list, newSocket, i, colors, 0, 0);
    i++;
    print_linked_list(client_list);
 
