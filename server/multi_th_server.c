@@ -5,6 +5,18 @@ int size;
 pthread_mutex_t **lock;
 int nplayers;
 
+void start_ui()
+{
+	if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
+		 printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
+		 exit(-1);
+	}
+	if(TTF_Init()==-1) {
+		printf("TTF_Init: %s\n", TTF_GetError());
+		exit(2);
+	}
+}
+
 int main(int argc, char* argv[]){
   int j;
   int serverSocket, newSocket;
@@ -33,9 +45,13 @@ int main(int argc, char* argv[]){
   }
 
   nplayers=0;
+  start_ui();
+  create_board_window(300, 300,  size);
 
   printf("initializing a board with size: %d\n", size);
   init_board(size);
+
+
   //client_data *clientdata = (client_data *) malloc(sizeof(client_data));
 
   //Create the socket.

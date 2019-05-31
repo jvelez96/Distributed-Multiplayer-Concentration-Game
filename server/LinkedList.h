@@ -65,6 +65,8 @@
 #define MAXPLAYERS 50
 #define CANCEL -1
 #define OKAY 1
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 typedef void * Item;
 
