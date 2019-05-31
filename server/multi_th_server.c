@@ -3,9 +3,10 @@
 PlayerList *client_list = NULL;
 int size;
 pthread_mutex_t **lock;
+int nplayers;
 
 int main(int argc, char* argv[]){
-  int nplayers=0, j;
+  int j;
   int serverSocket, newSocket;
   int *colors;
   int i=0;
@@ -30,6 +31,8 @@ int main(int argc, char* argv[]){
     printf("Only even numbers allowed for grid size\n");
     exit(1);
   }
+
+  nplayers=0;
 
   printf("initializing a board with size: %d\n", size);
   init_board(size);
