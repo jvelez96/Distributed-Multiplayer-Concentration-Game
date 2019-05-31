@@ -88,10 +88,10 @@ void get_board(int dim, int sockfd)
 		{
 
 				memset(buffer, 0, MAX);
-				n = recv(sockfd, buffer, MAX, 0);
+				n = read(sockfd, buffer, sizeof(buffer), 0);
 				if (n == -1)
         {
-            perror("error reading cell state");
+            perror("error reading");
             exit(-1);
         }
 				printf("buffer -> %s\n", buffer);
@@ -120,7 +120,7 @@ void * manage_sdlEvents(void *socket)
 						{
 							memset(buffer,0,MAX);
 							sprintf(buffer, "exit");
-							send(sockfd, buffer, sizeof(buffer), 0);
+							write(sockfd, buffer, sizeof(buffer), 0);
 							done = SDL_TRUE;
 							break;
 						}
@@ -131,7 +131,7 @@ void * manage_sdlEvents(void *socket)
 								get_board_card(event.button.x, event.button.y, &x, &y);
 								memset(buffer,0,MAX);
 								sprintf(buffer, "%d %d", x, y);
-								send(sockfd, buffer, MAX, 0);
+								write(sockfd, buffer, sizeof(buffer), 0);
 
 						}
 
@@ -163,7 +163,7 @@ void *play(int sockfd)
 		//aux1[2] = '\0';
 		//sscanf(buff, "%d,%d,%d,%s", &code, &board_x, &board_y, aux);
 
-		if (recv(sockfd, buffer, sizeof(buffer), 0)== -1)
+		if (read(sockfd, buffer, sizeof(buffer), 0)== -1)
 		{
 				perror("error receiving response");
 				exit(-1);
@@ -189,7 +189,7 @@ void *play(int sockfd)
 					paint_card(playX, playY, color[0], color[1], color[2]);
 					write_card(playX, playY, str_place, 200, 200, 200);
 					memset(buffer, 0, MAX);
-					recv(sockfd, buffer, sizeof(buffer), 0);
+					read(sockfd, buffer, sizeof(buffer), 0);
 					printf("%s", buffer);
 		      break;
 		}
@@ -220,7 +220,7 @@ int main(){
 	start_ui();
 
 	memset(buffer, 0, MAX);
-	recv(sockfd, buffer, sizeof(buffer), 0);
+	read(sockfd, buffer, sizeof(buffer), 0);
 	sscanf(buffer, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
 	printf("first information (%d,%d,%d,%d)\n", color_0, color_1, color_2, dim);
 
