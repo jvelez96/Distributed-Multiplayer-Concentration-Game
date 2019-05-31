@@ -10,7 +10,7 @@ int main(int argc, char* argv[]){
   int serverSocket, newSocket;
   int *colors;
   int i=0;
-  char buffer[BUFFERSIZE];
+  char buffer[BUFFERSIZE] ={'\0'};
 
   struct sockaddr_in serverAddr;
   struct sockaddr_storage serverStorage;
