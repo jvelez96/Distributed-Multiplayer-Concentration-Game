@@ -87,7 +87,7 @@ int main(int argc, char* argv[]){
 
    memset(buffer, 0, BUFFERSIZE); //erase buffer before inserting data
    sprintf(buffer, "%d %d %d %d", colors[0], colors[1], colors[2], size);
-   write(newSocket,buffer,sizeof(buffer));
+   send(newSocket,buffer,sizeof(buffer),0);
 
    if(nplayers >= 2){
      //send board
