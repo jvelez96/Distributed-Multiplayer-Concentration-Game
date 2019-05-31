@@ -159,6 +159,7 @@ void *play(int sockfd)
 		int color[3];
 		char str_place[3];
 		int n,n2;
+		char winners[100];
 
 
 		//char aux[3], aux1[3];
@@ -190,19 +191,10 @@ void *play(int sockfd)
 		      break;
 
 				case 2:
-					sscanf(buffer,"1 %d %d %s %d %d %d", &playX, &playY, str_place, &color[0], &color[1], &color[2]);
-					paint_card(playX, playY, color[0], color[1], color[2]);
-					write_card(playX, playY, str_place, 255, 255, 255);
-					memset(buffer, 0, MAX);
-					n2 = recv(sockfd, buffer, sizeof(buffer),0);
-					if (n < 0 || n ==EOF)
-	        {
-							close(sockfd);
-	            perror("error reading");
-	            exit(-1);
-	        }
-					printf("%s", buffer);
-		      break;
+					sscanf(buffer,"2 %s", winners);
+					printf("winners: %s\n", winners);
+					close_board_windows();
+					exit(1);
 		}
 
 
