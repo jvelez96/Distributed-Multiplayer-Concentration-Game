@@ -129,7 +129,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
   pthread_t tid;
   //struct args *broadcast_args = (struct args *)malloc(sizeof(struct args));
   //struct args *broadcast_args;
-  printf("manage player\n");
+
   if(strcmp(buffer, "exit")== 0){
     //remove from list
     client_list = remove_player(client_list, player->player_id);
@@ -155,7 +155,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     //fill the position
     resp[socket].code = 0;
     printf("x and y %d %d\n", resp[socket].play1[0], resp[socket].play1[1]);
-    pthread_mutex_unlock(&lock[resp[socket].play1[0]][resp[socket].play1[1]]);
+    pthread_mutex_unlock(&lock[x][y]);
 
     update_color(x,y, player->color);
 
