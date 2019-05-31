@@ -123,6 +123,7 @@ void * manage_sdlEvents(void *socket)
 							sprintf(buffer, "exit");
 							send(sockfd, buffer, sizeof(buffer),0);
 							done = SDL_TRUE;
+							close_board_windows();
 							break;
 						}
 
