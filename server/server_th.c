@@ -144,6 +144,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
   printf("1st play x:%d y:%d\n", x, y);
 
   pthread_mutex_lock(&lock[x][y]);
+  printf("passed mutex\n");
   resp[socket] = board_play(x,y,socket, OKAY);
   printf("play response:\ncode %d\n", resp[socket].code);
 
@@ -156,6 +157,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     resp[socket].code = 0;
     printf("x and y %d %d\n", resp[socket].play1[0], resp[socket].play1[1]);
     pthread_mutex_unlock(&lock[x][y]);
+
 
     update_color(x,y, player->color);
 
