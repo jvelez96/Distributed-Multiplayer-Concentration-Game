@@ -115,9 +115,9 @@ int main(int argc, char* argv[]){
       printf("Failed to create thread\n");
     }
 
-    for(j=0; j<i;j++){
-      pthread_join(tid[j],NULL);
-    }
+  }
+  for(j=0; j<i;j++){
+    pthread_join(tid[j],NULL);
   }
   //pthread_mutex_destroy(*lock);
   return 0;
