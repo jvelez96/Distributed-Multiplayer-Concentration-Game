@@ -18,15 +18,18 @@ void update_color(int x, int y, int *color){
   return;
 }
 
-void * broadcast_play(void *buffer){
-  PlayerList *curr;
-
-  curr = client_list;
-
+void * broadcast_play(void *args){
+  /*
   while(curr != NULL){
     send(curr->socket, (char*) buffer, BUFFERSIZE,0);
     curr = curr->next;
   }
+  */
+  int socket = ((struct args*)args)->socket;
+  char buffer[BUFFERSIZE];
+  strcpy(buffer, ((struct args*)args)->buff);
+
+  send(socket, (char*) buffer, BUFFERSIZE,0);
   pthread_exit(NULL);
 }
 
@@ -87,8 +90,12 @@ void * read_secondplay_buffer(void *socket){
 void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 {
   //char first_play[3];
+  int i=0, j;
   int x,y;
+  pthread_t tids[MAXPLAYERS];
   pthread_t tid;
+  PlayerList *curr;
+  struct args *broadcast_args = (struct args *)malloc(sizeof(struct args));
 
   if(strcmp(buffer, "exit")== 0){
     //remove from list
@@ -113,10 +120,20 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     update_color(x,y, player->color);
 
     //broadcast play to all Players
-    memset(buffer, 0, BUFFERSIZE);
-    sprintf(buffer, "%d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
-    pthread_create(&tid, NULL, broadcast_play, (void*)buffer);
-    pthread_join(tid, NULL);
+    memset(broadcast_args->buff, 0, BUFFERSIZE);
+    sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
+
+    curr = client_list;
+    while(curr != NULL){
+      //send(curr->socket, (char*) buffer, BUFFERSIZE,0);
+      broadcast_args->socket = curr->socket;
+      pthread_create(&tids[i], NULL, broadcast_play, (void*)broadcast_args);
+      curr = curr->next;
+      i++;
+    }
+    //pthread_create(&tid, NULL, broadcast_play, (void*)buffer);
+    for(j=0;j<i;j++)
+      pthread_join(tids[j], NULL);
 
     //pthread_mutex_unlock(&lock[x][y]);
 
@@ -133,12 +150,16 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
       case -1:
         *done = 1;
         // remove player from list
+        // send card down
       break;
       case -2:
         // different cards
+        // send card up
       break;
       case 0:
         // place filled
+        //
+
       break;
       case 2:
         // correct cards
