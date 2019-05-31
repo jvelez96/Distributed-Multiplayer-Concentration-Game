@@ -6,6 +6,8 @@
 #define SA struct sockaddr
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include<pthread.h>
+
 
 
 #include "UI_library.h"
@@ -84,16 +86,17 @@ void get_board(int dim, int sockfd)
 		{
 
 				memset(buffer, 0, MAX);
-				recv(sockfd, buff, sizeof(buff), 0);
-				sscanf(buff, "%d %d %s %d %d %d", &aux_x, &aux_y, xx, &color[0], &color[1], &color[2]);
+				recv(sockfd, buffer, sizeof(buffer), 0);
+				sscanf(buffer, "%d %d %s %d %d %d", &aux_x, &aux_y, xx, &color[0], &color[1], &color[2]);
 				paint_card(aux_x, aux_y, color[0], color[1], color[2]);
 				write_card(aux_x, aux_y, xx, color[0], color[1], color[2]);
 		}
 }
 
-void *manage_sdlEvents(int sockfd)
+void * manage_sdlEvents(void *socket)
 {
     int done = 0;
+		int sockfd = *((int*)socket);
     SDL_Event event;
     char buffer[MAX];
 
@@ -107,7 +110,7 @@ void *manage_sdlEvents(int sockfd)
 						{
 							memset(buffer,0,MAX);
 							sprintf(buffer, "exit");
-							send(sockfd, buff, sizeof(buff), 0);
+							send(sockfd, buffer, sizeof(buffer), 0);
 							done = SDL_TRUE;
 							break;
 						}
@@ -118,7 +121,7 @@ void *manage_sdlEvents(int sockfd)
 								get_board_card(event.button.x, event.button.y, &x, &y);
 								memset(buffer,0,MAX);
 								sprintf(buffer, "%d %d", x, y);
-								send(sockfd, buff, sizeof(buff), 0);
+								send(sockfd, buffer, MAX, 0);
 
 						}
 
@@ -127,8 +130,6 @@ void *manage_sdlEvents(int sockfd)
 
 		}
 		pthread_exit(NULL);
-
-
 }
 
 
@@ -136,6 +137,7 @@ void *play(int sockfd)
 {
 	char buffer[MAX];
 	int done = 0;
+	int n;
 
 	while (!done)
 	{
@@ -145,6 +147,7 @@ void *play(int sockfd)
 		if(strcmp(buffer, "exit")== 0){
 
 
+		}
 	}
 }
 
@@ -185,9 +188,9 @@ int main(){
 
 	get_board(dim,sockfd);
 
-	pthread_create(&events_thread, NULL, manage_sdlEvents, NULL);
+	pthread_create(&events_thread, NULL, manage_sdlEvents, (void*)&sockfd);
 
-	play(sockfd);
+	//play(sockfd);
 	//paint_card(aux_x, aux_y, color_r, color_g, color_b);
 	//write_card(aux_x, aux_y, xx, color_r, color_g, color_b);
 
