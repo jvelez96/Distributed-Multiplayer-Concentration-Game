@@ -124,6 +124,7 @@ void * manage_sdlEvents(void *socket)
 							send(sockfd, buffer, sizeof(buffer),0);
 							done = SDL_TRUE;
 							close_board_windows();
+							exit(0);
 							break;
 						}
 
