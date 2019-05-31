@@ -99,7 +99,7 @@ void get_board(int dim, int sockfd)
 				sscanf(buffer, "%d %d %s %d %d %d", &aux_x, &aux_y, xx, &color[0], &color[1], &color[2]);
 				//printf("casa %d\ncoordenadas: %d %d\nletras: %s\ncor: %d %d %d\n", i, aux_x, aux_y, xx, color[0], color[1], color[2]);
 				paint_card(aux_x, aux_y, color[0], color[1], color[2]);
-				write_card(aux_x, aux_y, xx, 200,200,200);
+				write_card(aux_x, aux_y, xx, 255,255,255);
 				printf("casa %d\ncoordenadas: %d %d\nletras: %s\ncor: %d %d %d\n", i, aux_x, aux_y, xx, color[0], color[1], color[2]);
 		}
 }
