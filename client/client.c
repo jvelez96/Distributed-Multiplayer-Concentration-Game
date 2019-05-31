@@ -142,12 +142,51 @@ void *play(int sockfd)
 	while (!done)
 	{
 		memset(buffer, 0, MAX);
-		n = read(sockfd, buffer, MAX);
+		int code = 0;
+		int playX, playY;
+		int color[3];
+		char str_place[3];
 
-		if(strcmp(buffer, "exit")== 0){
 
+		//char aux[3], aux1[3];
+		//aux[2] = '\0';
+		//aux1[2] = '\0';
+		//sscanf(buff, "%d,%d,%d,%s", &code, &board_x, &board_y, aux);
 
+		if (recv(sockfd, buffer, sizeof(buffer), 0)== -1)
+		{
+				perror("error receiving response");
+				exit(-1);
 		}
+
+		sscanf(buffer, "%d", &code);
+
+		switch(code)
+		{
+				case 0:
+					sscanf(buffer,"0 %d %d 255 255 255", &playX, &playY);
+					paint_card(playX, playY , 255, 255, 255);
+	        break;
+
+				case 1:
+					sscanf(buffer,"1 %d %d %s %d %d %d", &playX, &playY, str_place, &color[0], &color[1], &color[2]);
+					paint_card(playX, playY , color[0], color[1], color[2]);
+					write_card(playX, playY , str_place, 200, 200, 200);
+		      break;
+
+				case 2:
+					sscanf(buffer,"1 %d %d %s %d %d %d", &playX, &playY, str_place, &color[0], &color[1], &color[2]);
+					paint_card(playX, playY, color[0], color[1], color[2]);
+					write_card(playX, playY, str_place, 200, 200, 200);
+					memset(buffer, 0, MAX);
+					recv(sockfd, buffer, sizeof(buffer), 0);
+					printf("%s", buffer);
+		      break;
+		}
+
+
+
+
 	}
 }
 
