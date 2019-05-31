@@ -154,6 +154,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     /* valid first play */
     //fill the position
     resp[socket].code = 0;
+    pthread_mutex_unlock(&lock[resp[socket].play1[0]][resp[socket].play1[1]]);
 
     update_color(x,y, player->color);
 
@@ -166,7 +167,6 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 
 
     broadcast();
-    pthread_mutex_unlock(&lock[resp[socket].play1[0]][resp[socket].play1[1]]);
     /*
     curr = client_list;
     while(curr != NULL){
