@@ -29,6 +29,7 @@ void * broadcast_play(void *args){
   char buffer[BUFFERSIZE];
   strcpy(buffer, ((struct args*)args)->buff);
 
+  printf("sending buffer: %s\nto %d\n", buffer,socket);
   send(socket, (char*) buffer, BUFFERSIZE,0);
   pthread_exit(NULL);
 }
@@ -87,6 +88,25 @@ void * read_secondplay_buffer(void *socket){
   pthread_exit(NULL);
 }
 
+void broadcast(struct args *broadcast_args){
+  PlayerList *curr = client_list;
+  int i= 0;
+  int j;
+  pthread_t tids[MAXPLAYERS];
+
+  // verificar se esta a receber bem os args
+  while(curr != NULL){
+    //send(curr->socket, (char*) buffer, BUFFERSIZE,0);
+    broadcast_args->socket = curr->socket;
+    pthread_create(&tids[i], NULL, broadcast_play, (void*)broadcast_args);
+    curr = curr->next;
+    i++;
+  }
+  //pthread_create(&tid, NULL, broadcast_play, (void*)buffer);
+  for(j=0;j<i;j++)
+    pthread_join(tids[j], NULL);
+}
+
 void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 {
   //char first_play[3];
@@ -96,6 +116,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
   pthread_t tid;
   PlayerList *curr;
   struct args *broadcast_args = (struct args *)malloc(sizeof(struct args));
+  //struct args *broadcast_args;
 
   if(strcmp(buffer, "exit")== 0){
     //remove from list
@@ -123,6 +144,8 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     memset(broadcast_args->buff, 0, BUFFERSIZE);
     sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
 
+    broadcast(broadcast_args);
+    /*
     curr = client_list;
     while(curr != NULL){
       //send(curr->socket, (char*) buffer, BUFFERSIZE,0);
@@ -134,6 +157,8 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     //pthread_create(&tid, NULL, broadcast_play, (void*)buffer);
     for(j=0;j<i;j++)
       pthread_join(tids[j], NULL);
+      */
+
 
     //pthread_mutex_unlock(&lock[x][y]);
 
@@ -150,19 +175,72 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
       case -1:
         *done = 1;
         // remove player from list
+
         // send card down
+        //broadcast play to all Players
+        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
+
+        broadcast(broadcast_args);
+
+
       break;
       case -2:
         // different cards
-        // send card up
+        // send 2 cards down
+
+        //broadcast play to all Players 2nd play
+        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d",resp[socket].play2[0] , resp[socket].play2[1], resp[socket].str_play2, player->color[0], player->color[1], player->color[2]);
+        //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
+
+        broadcast(broadcast_args);
+
+        sleep(2);
+
+        //broadcast play to all Players cards down
+        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play2[0], resp[socket].play2[1]);
+
+        broadcast(broadcast_args);
+
+        //broadcast play to all Players
+        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
+
+        broadcast(broadcast_args);
+
+
+
       break;
       case 0:
         // place filled
-        //
+        resp[socket] = board_play(x,y,socket, CANCEL);
+
+        //broadcast play to all Players
+        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
+
+        broadcast(broadcast_args);
 
       break;
       case 2:
         // correct cards
+
+        //broadcast play to all Players
+        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
+
+        broadcast(broadcast_args);
+        //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
+      break;
+      case 3:
+        //broadcast play to all Players
+        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
+
+        broadcast(broadcast_args);
+        //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
       break;
     }
   }
