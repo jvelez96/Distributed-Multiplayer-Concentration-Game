@@ -297,7 +297,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         PlayerList *aux = client_list;
 
         memset(broadcast_buf,0, BUFFERSIZE);
-        strcpy(broadcast_buf, "2");
+        strcpy(broadcast_buf, "2 ");
 
         while(aux != NULL){
           if(max_points <= aux->points){
