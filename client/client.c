@@ -82,14 +82,17 @@ void get_board(int dim, int sockfd)
     char xx[3];
     int color[3];
 
+		printf("get_board começa aqui! :\n\n");
+
     for(i = 1; i <= pow(dim,2); i++)
 		{
 
 				memset(buffer, 0, MAX);
-				recv(sockfd, buffer, sizeof(buffer), 0);
+				recv(sockfd, buffer, MAX, 0);
 				sscanf(buffer, "%d %d %s %d %d %d", &aux_x, &aux_y, xx, &color[0], &color[1], &color[2]);
 				paint_card(aux_x, aux_y, color[0], color[1], color[2]);
-				write_card(aux_x, aux_y, xx, color[0], color[1], color[2]);
+				write_card(aux_x, aux_y, xx, 200,200,200);
+				printf("casa %d\ncoordenadas: %d %d\nletras: %s\ncor: %d %d %d\n", i, aux_x, aux_y, xx, color[0], color[1], color[2]);
 		}
 }
 
@@ -209,7 +212,7 @@ int main(){
 	sockfd = create_socket( "127.0.0.1", PORT );
 	start_ui();
 
-	bzero(buff, MAX);
+	memset(buffer, 0, MAX);
 	recv(sockfd, buff, sizeof(buff), 0);
 	sscanf(buff, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
 	printf("first information (%d,%d,%d,%d)\n", color_0, color_1, color_2, dim);
@@ -229,7 +232,7 @@ int main(){
 
 	pthread_create(&events_thread, NULL, manage_sdlEvents, (void*)&sockfd);
 
-	//play(sockfd);
+	play(sockfd);
 	//paint_card(aux_x, aux_y, color_r, color_g, color_b);
 	//write_card(aux_x, aux_y, xx, color_r, color_g, color_b);
 
