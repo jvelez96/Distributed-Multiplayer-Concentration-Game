@@ -33,9 +33,13 @@ int main(int argc, char* argv[]){
   }
 
   nplayers=0;
+  start_ui();
+  create_board_window(300, 300,  size);
 
   printf("initializing a board with size: %d\n", size);
   init_board(size);
+
+
   //client_data *clientdata = (client_data *) malloc(sizeof(client_data));
 
   //Create the socket.

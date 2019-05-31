@@ -151,6 +151,10 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     memset(broadcast_args->buff, 0, BUFFERSIZE);
     sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
 
+    paint_card(x, y, player->color[0], player->color[1], player->color[2]);
+    write_card(x, y, resp[socket].str_play1, COLORNR, COLORNR, COLORNR);
+
+
     broadcast(broadcast_args);
     /*
     curr = client_list;
@@ -189,6 +193,10 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         // send card down
         //broadcast play to all Players
         //memset(broadcast_args->buff, 0, BUFFERSIZE);
+
+        paint_card(resp[socket].play1[0], resp[socket].play1[1], COLORNR, COLORNR, COLORNR);
+        write_card(resp[socket].play1[0], resp[socket].play1[1], resp[socket].str_play1, COLORNR, COLORNR, COLORNR);
+
         sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
 
         broadcast(broadcast_args);
@@ -204,6 +212,11 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d",resp[socket].play2[0] , resp[socket].play2[1], resp[socket].str_play2, player->color[0], player->color[1], player->color[2]);
         //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
 
+        write_card(resp[socket].play1[0], resp[socket].play1[1], resp[socket].str_play2, 255, 0, 0);
+
+        paint_card(resp[socket].play2[0], resp[socket].play2[1], player->color[0], player->color[1],player->color[2]);
+        write_card(resp[socket].play2[0], resp[socket].play2[1], resp[socket].str_play2, 255, 0, 0);
+
         broadcast(broadcast_args);
 
         sleep(2);
@@ -211,6 +224,12 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         //broadcast play to all Players cards down
         //memset(broadcast_args->buff, 0, BUFFERSIZE);
         sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play2[0], resp[socket].play2[1]);
+
+        paint_card(resp[socket].play2[0], resp[socket].play2[1], COLORNR, COLORNR, COLORNR);
+        write_card(resp[socket].play2[0], resp[socket].play2[1], resp[socket].str_play2, COLORNR, COLORNR, COLORNR);
+
+        paint_card(resp[socket].play1[0], resp[socket].play1[1], COLORNR, COLORNR, COLORNR);
+        write_card(resp[socket].play1[0], resp[socket].play1[1], resp[socket].str_play2, COLORNR, COLORNR, COLORNR);
 
         broadcast(broadcast_args);
 
