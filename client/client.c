@@ -76,7 +76,7 @@ void start_ui()
 
 void get_board(int dim, int sockfd)
 {
-		char buffer[MAX];
+		char buffer[MAX] = {'\0'};
 		int i,j,n;
 		int aux_x, aux_y;
     char xx[3];
@@ -94,7 +94,7 @@ void get_board(int dim, int sockfd)
             perror("error reading");
             exit(-1);
         }
-				printf("buffer -> %s\n", buffer);
+				printf("buffer -> %s\ni -> %d\n", buffer, i);
 				sscanf(buffer, "%d %d %s %d %d %d", &aux_x, &aux_y, xx, &color[0], &color[1], &color[2]);
 				//printf("casa %d\ncoordenadas: %d %d\nletras: %s\ncor: %d %d %d\n", i, aux_x, aux_y, xx, color[0], color[1], color[2]);
 				paint_card(aux_x, aux_y, color[0], color[1], color[2]);
@@ -108,7 +108,7 @@ void * manage_sdlEvents(void *socket)
     int done = 0;
 		int sockfd = *((int*)socket);
     SDL_Event event;
-    char buffer[MAX];
+    char buffer[MAX]= {'\0'};
 
     while (!done)
     {
@@ -145,7 +145,7 @@ void * manage_sdlEvents(void *socket)
 
 void *play(int sockfd)
 {
-	char buffer[MAX];
+	char buffer[MAX] = {'\0'};
 	int done = 0;
 	int n;
 
@@ -205,7 +205,7 @@ int main(){
 	//Create session with the server
 	int sockfd;
   struct sockaddr_in servaddr, cli;
-	char buffer[MAX];
+	char buffer[MAX] = {'\0'};
 	pthread_t events_thread;
 
 	//int done = 0;
