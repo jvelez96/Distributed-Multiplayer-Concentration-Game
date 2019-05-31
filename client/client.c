@@ -120,7 +120,7 @@ void * manage_sdlEvents(void *socket)
 						{
 							memset(buffer,0,MAX);
 							sprintf(buffer, "exit");
-							write(sockfd, buffer, sizeof(buffer), 0);
+							write(sockfd, buffer, sizeof(buffer));
 							done = SDL_TRUE;
 							break;
 						}
@@ -131,7 +131,7 @@ void * manage_sdlEvents(void *socket)
 								get_board_card(event.button.x, event.button.y, &x, &y);
 								memset(buffer,0,MAX);
 								sprintf(buffer, "%d %d", x, y);
-								write(sockfd, buffer, sizeof(buffer), 0);
+								write(sockfd, buffer, sizeof(buffer));
 
 						}
 
