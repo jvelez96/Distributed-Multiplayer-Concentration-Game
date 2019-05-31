@@ -109,12 +109,8 @@ void broadcast(struct args *broadcast_args){
 
 void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 {
-  //char first_play[3];
-  int i=0, j;
   int x,y;
-  pthread_t tids[MAXPLAYERS];
   pthread_t tid;
-  PlayerList *curr;
   struct args *broadcast_args = (struct args *)malloc(sizeof(struct args));
   //struct args *broadcast_args;
 
