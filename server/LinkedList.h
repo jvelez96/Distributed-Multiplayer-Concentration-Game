@@ -83,6 +83,8 @@ typedef struct LinkedListStruct
   int color[3];
   int socket;
   int status;
+  int points;
+  int winner;
   struct LinkedListStruct *next;
 }PlayerList;
 
@@ -166,7 +168,7 @@ PlayerList* getNextNodeLinkedList(PlayerList* node);
  ******************************************************************************/
 //PlayerList* insertUnsortedLinkedList(PlayerList* next, Item this);
 
-PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_id ,int *colors, int status);
+PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_id ,int *colors, int status, int points);
 
 PlayerList *get_last_player(PlayerList *head);
 PlayerList *remove_player(PlayerList *head, int player_id);
