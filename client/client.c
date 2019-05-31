@@ -77,19 +77,26 @@ void start_ui()
 void get_board(int dim, int sockfd)
 {
 		char buffer[MAX];
-		int i,j;
+		int i,j,n;
 		int aux_x, aux_y;
     char xx[3];
     int color[3];
 
 		printf("get_board começa aqui! :\n\n");
 
-    for(i = 1; i <= pow(dim,2); i++)
+    for(i = 0; i < pow(dim,2); i++)
 		{
 
 				memset(buffer, 0, MAX);
-				recv(sockfd, buffer, MAX, 0);
+				n = recv(sockfd, buffer, MAX, 0);
+				if (n == -1)
+        {
+            perror("error reading cell state");
+            exit(-1);
+        }
+				printf("buffer -> %s\n", buffer);
 				sscanf(buffer, "%d %d %s %d %d %d", &aux_x, &aux_y, xx, &color[0], &color[1], &color[2]);
+				//printf("casa %d\ncoordenadas: %d %d\nletras: %s\ncor: %d %d %d\n", i, aux_x, aux_y, xx, color[0], color[1], color[2]);
 				paint_card(aux_x, aux_y, color[0], color[1], color[2]);
 				write_card(aux_x, aux_y, xx, 200,200,200);
 				printf("casa %d\ncoordenadas: %d %d\nletras: %s\ncor: %d %d %d\n", i, aux_x, aux_y, xx, color[0], color[1], color[2]);
@@ -198,7 +205,7 @@ int main(){
 	//Create session with the server
 	int sockfd;
   struct sockaddr_in servaddr, cli;
-	char buff[MAX];
+	char buffer[MAX];
 	pthread_t events_thread;
 
 	//int done = 0;
@@ -213,8 +220,8 @@ int main(){
 	start_ui();
 
 	memset(buffer, 0, MAX);
-	recv(sockfd, buff, sizeof(buff), 0);
-	sscanf(buff, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
+	recv(sockfd, buffer, sizeof(buffer), 0);
+	sscanf(buffer, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
 	printf("first information (%d,%d,%d,%d)\n", color_0, color_1, color_2, dim);
 
 	/*bzero(buff, MAX);
