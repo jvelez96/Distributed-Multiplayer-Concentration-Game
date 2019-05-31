@@ -27,7 +27,7 @@ void * broadcast_play(void *args){
   }
   */
   int socket = ((struct args*)args)->socket;
-  char buffer[BUFFERSIZE];
+  char buffer[BUFFERSIZE] = {'\0'};
   strcpy(buffer, ((struct args*)args)->buff);
 
   printf("sending buffer: %s\nto %d\n", buffer,socket);
@@ -42,7 +42,7 @@ void * read_secondplay_buffer(void *socket){
   fd_set rfds;
   struct timeval tv;
   int retval;
-  char buffer[BUFFERSIZE];
+  char buffer[BUFFERSIZE]={'\0'};
 
   /* Watch stdin (socket) to see when it has input. */
 
@@ -170,6 +170,8 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
     pthread_create(&tid, NULL, read_secondplay_buffer, (void*)&socket);
     pthread_join(tid, NULL);
 
+    //broadcast_args->buff[BUFFERSIZE] ={'\0'};
+    memset(broadcast_args->buff, 0, BUFFERSIZE);
     switch (resp[socket].code) {
       /* exit in second play */
       case -1:
@@ -179,7 +181,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         nplayers--;
         // send card down
         //broadcast play to all Players
-        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        //memset(broadcast_args->buff, 0, BUFFERSIZE);
         sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
 
         broadcast(broadcast_args);
@@ -191,7 +193,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         // send 2 cards down
 
         //broadcast play to all Players 2nd play
-        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        //memset(broadcast_args->buff, 0, BUFFERSIZE);
         sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d",resp[socket].play2[0] , resp[socket].play2[1], resp[socket].str_play2, player->color[0], player->color[1], player->color[2]);
         //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
 
@@ -200,13 +202,13 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         sleep(2);
 
         //broadcast play to all Players cards down
-        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        //memset(broadcast_args->buff, 0, BUFFERSIZE);
         sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play2[0], resp[socket].play2[1]);
 
         broadcast(broadcast_args);
 
         //broadcast play to all Players
-        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        //memset(broadcast_args->buff, 0, BUFFERSIZE);
         sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
 
         broadcast(broadcast_args);
@@ -219,7 +221,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         resp[socket] = board_play(x,y,socket, CANCEL);
 
         //broadcast play to all Players
-        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        //memset(broadcast_args->buff, 0, BUFFERSIZE);
         sprintf(broadcast_args->buff, "0 %d %d 255 255 255", resp[socket].play1[0], resp[socket].play1[1]);
 
         broadcast(broadcast_args);
@@ -229,7 +231,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         // correct cards
 
         //broadcast play to all Players
-        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        //memset(broadcast_args->buff, 0, BUFFERSIZE);
         sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
 
         broadcast(broadcast_args);
@@ -237,7 +239,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
       break;
       case 3:
         //broadcast play to all Players
-        memset(broadcast_args->buff, 0, BUFFERSIZE);
+        //memset(broadcast_args->buff, 0, BUFFERSIZE);
         sprintf(broadcast_args->buff, "1 %d %d %s %d %d %d", x, y, resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
 
         broadcast(broadcast_args);
@@ -255,7 +257,7 @@ void write_buffer(char *buffer, int *color, struct play_response *play, char *st
 void send_board(){
   int i;
   int x, y;
-  char buffer[BUFFERSIZE];
+  char buffer[BUFFERSIZE] = {'\0'};
   PlayerList *curr;
 
   for(x=0;x<size;x++){
@@ -309,7 +311,7 @@ void * first_play_thread(void *socket)
 {
   int done = 0;
   int newSocket = *((int*)socket);
-  char buffer[BUFFERSIZE];
+  char buffer[BUFFERSIZE]= {'\0'};
   PlayerList *player_info;
 
   player_info = get_last_player(client_list);
