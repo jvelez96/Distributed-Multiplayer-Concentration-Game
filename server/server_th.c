@@ -33,6 +33,7 @@ void * broadcast_play(void *sock){
 
   printf("sending buffer: %s\nto %d\n", buffer,socket);
   send(socket, (char*) buffer, sizeof(buffer),0);
+  free(sock);
   pthread_exit(NULL);
 }
 
@@ -102,13 +103,14 @@ void broadcast(){
   int i= 0;
   int j;
   pthread_t tids[MAXPLAYERS];
-  int socket;
+  int *socket;
 
   // verificar se esta a receber bem os args
   while(curr != NULL){
     //send(curr->socket, (char*) buffer, BUFFERSIZE,0);
-    socket = curr->socket;
-    pthread_create(&tids[i], NULL, broadcast_play, (void*) &socket);
+    socket = malloc(sizeof(*socket));
+    *socket = curr->socket;
+    pthread_create(&tids[i], NULL, broadcast_play, (void*) socket);
     curr = curr->next;
     i++;
   }
