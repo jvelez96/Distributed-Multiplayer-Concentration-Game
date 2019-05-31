@@ -1,6 +1,6 @@
 #include "server_th.h"
 
-extern pthread_mutex_t **lock;
+//extern pthread_mutex_t **lock;
 extern PlayerList *client_list;
 extern int size;
 extern board_place * board;
