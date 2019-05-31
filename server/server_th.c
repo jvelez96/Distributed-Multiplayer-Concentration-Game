@@ -1,12 +1,13 @@
 #include "server_th.h"
 
-extern pthread_mutex_t lock;
+extern pthread_mutex_t **lock;
 extern PlayerList *client_list;
 extern int size;
 extern board_place * board;
 extern int n_corrects;
 extern int play1[MAXPLAYERS][2];
 extern play_response resp[MAXPLAYERS];
+extern int nplayers;
 
 void update_color(int x, int y, int *color){
   int i;
@@ -116,7 +117,9 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 
   if(strcmp(buffer, "exit")== 0){
     //remove from list
+    client_list = remove_player(client_list, player->player_id);
     printf("player with socket %d exited\n", socket);
+    nplayers--;
     *done = 1;
     return;
   }
@@ -171,7 +174,8 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
       case -1:
         *done = 1;
         // remove player from list
-
+        client_list = remove_player(client_list, player->player_id);
+        nplayers--;
         // send card down
         //broadcast play to all Players
         memset(broadcast_args->buff, 0, BUFFERSIZE);
