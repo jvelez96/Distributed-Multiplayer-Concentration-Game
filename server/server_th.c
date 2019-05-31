@@ -320,6 +320,7 @@ void * first_play_thread(void *socket)
   int newSocket = *((int*)socket);
   char buffer[BUFFERSIZE]= {'\0'};
   PlayerList *player_info;
+  int n;
 
   player_info = get_last_player(client_list);
 
