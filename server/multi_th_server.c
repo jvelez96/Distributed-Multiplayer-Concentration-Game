@@ -91,7 +91,6 @@ int main(int argc, char* argv[]){
 
    if(nplayers >= 2){
      //send board
-     print_linked_list(client_list);
      send_board();
    }
    printf("create thread\n");

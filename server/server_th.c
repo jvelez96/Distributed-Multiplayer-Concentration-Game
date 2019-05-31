@@ -114,7 +114,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
   pthread_t tid;
   struct args *broadcast_args = (struct args *)malloc(sizeof(struct args));
   //struct args *broadcast_args;
-
+  printf("manage player\n");
   if(strcmp(buffer, "exit")== 0){
     //remove from list
     client_list = remove_player(client_list, player->player_id);
@@ -125,6 +125,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
   }
 
   sscanf(buffer, "%d %d", &x, &y);
+  printf("1st play x:%d y:%d\n", x, y);
 
   //pthread_mutex_lock(&lock[x][y]);
   resp[socket] = board_play(x,y,socket, OKAY);
@@ -321,10 +322,10 @@ void * first_play_thread(void *socket)
     printf("Reading 1st play of player %d\n", player_info->player_id);
   }
 
-
   while(!done){
     memset(buffer, 0, BUFFERSIZE);
     recv(newSocket, buffer, BUFFERSIZE,0);
+    printf("first play received %s\n", buffer);
 
     manage_player(buffer, newSocket, &done, player_info);
 
