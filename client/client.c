@@ -93,11 +93,11 @@ void get_board(int dim, int sockfd)
 
 void *manage_sdlEvents(int sockfd)
 {
-    int finished = 0;
+    int done = 0;
     SDL_Event event;
     char buffer[MAX];
 
-    while (!finished)
+    while (!done)
     {
         while (SDL_PollEvent(&event))
         {
@@ -135,43 +135,15 @@ void *manage_sdlEvents(int sockfd)
 void *play(int sockfd)
 {
 	char buffer[MAX];
-	int finished = 0;
+	int done = 0;
 
-	while (!finished)
+	while (!done)
 	{
 		memset(buffer, 0, MAX);
 		n = read(sockfd, buffer, MAX);
 
-		switch (code)
-		{
-			case 1:
-				strcpy(aux1,aux);
-				paint_card(board_x, board_y, color_0, color_1, color_2);
-				write_card(board_x, board_y, aux1, 200, 200, 200);
-				aux_x = board_x;
-				aux_y = board_y;
-				break;
+		if(strcmp(buffer, "exit")== 0){
 
-			case 2:
-					paint_card(aux_x, aux_y, color_0, color_1, color_2);
-					write_card(aux_x, aux_y, aux1, 0, 0, 0);
-					paint_card(board_x, board_y , color_0, color_1, color_2);
-					write_card(board_x, board_y, aux, 0, 0, 0);
-					break;
-
-			case 3:
-				done = 1;
-
-			case -2:
-				paint_card(aux_x, aux_y, color_0, color_1, color_2);
-				write_card(aux_x, aux_y, aux1, 255, 0, 0);
-				paint_card(board_x, board_y , color_0, color_1, color_2);
-				write_card(board_x, board_y, aux, 255, 0, 0);
-				sleep(2);
-				paint_card(aux_x, aux_y , 255, 255, 255);
-				paint_card(board_x, board_y, 255, 255, 255);
-				break;
-		}
 
 	}
 }
@@ -184,7 +156,7 @@ int main(){
 	char buff[MAX];
 	pthread_t events_thread;
 
-	int done = 0;
+	//int done = 0;
 	SDL_Event event;
 
 	//Player and board constants
