@@ -77,19 +77,29 @@ void start_ui()
 void get_board(int dim, int sockfd)
 {
 		char buffer[MAX];
-		int i,j;
+		int i,j,n;
 		int aux_x, aux_y;
     char xx[3];
     int color[3];
 
-    for(i = 1; i <= pow(dim,2); i++)
+		printf("get_board começa aqui! :\n\n");
+
+    for(i = 0; i < pow(dim,2); i++)
 		{
 
 				memset(buffer, 0, MAX);
-				recv(sockfd, buffer, sizeof(buffer), 0);
+				n = read(sockfd, buffer, sizeof(buffer));
+				if (n == -1)
+        {
+            perror("error reading");
+            exit(-1);
+        }
+				printf("buffer -> %s\n", buffer);
 				sscanf(buffer, "%d %d %s %d %d %d", &aux_x, &aux_y, xx, &color[0], &color[1], &color[2]);
+				//printf("casa %d\ncoordenadas: %d %d\nletras: %s\ncor: %d %d %d\n", i, aux_x, aux_y, xx, color[0], color[1], color[2]);
 				paint_card(aux_x, aux_y, color[0], color[1], color[2]);
-				write_card(aux_x, aux_y, xx, color[0], color[1], color[2]);
+				write_card(aux_x, aux_y, xx, 200,200,200);
+				printf("casa %d\ncoordenadas: %d %d\nletras: %s\ncor: %d %d %d\n", i, aux_x, aux_y, xx, color[0], color[1], color[2]);
 		}
 }
 
@@ -110,7 +120,7 @@ void * manage_sdlEvents(void *socket)
 						{
 							memset(buffer,0,MAX);
 							sprintf(buffer, "exit");
-							send(sockfd, buffer, sizeof(buffer), 0);
+							write(sockfd, buffer, sizeof(buffer), 0);
 							done = SDL_TRUE;
 							break;
 						}
@@ -121,7 +131,7 @@ void * manage_sdlEvents(void *socket)
 								get_board_card(event.button.x, event.button.y, &x, &y);
 								memset(buffer,0,MAX);
 								sprintf(buffer, "%d %d", x, y);
-								send(sockfd, buffer, MAX, 0);
+								write(sockfd, buffer, sizeof(buffer), 0);
 
 						}
 
@@ -153,7 +163,7 @@ void *play(int sockfd)
 		//aux1[2] = '\0';
 		//sscanf(buff, "%d,%d,%d,%s", &code, &board_x, &board_y, aux);
 
-		if (recv(sockfd, buffer, sizeof(buffer), 0)== -1)
+		if (read(sockfd, buffer, sizeof(buffer))== -1)
 		{
 				perror("error receiving response");
 				exit(-1);
@@ -179,7 +189,7 @@ void *play(int sockfd)
 					paint_card(playX, playY, color[0], color[1], color[2]);
 					write_card(playX, playY, str_place, 200, 200, 200);
 					memset(buffer, 0, MAX);
-					recv(sockfd, buffer, sizeof(buffer), 0);
+					read(sockfd, buffer, sizeof(buffer));
 					printf("%s", buffer);
 		      break;
 		}
@@ -195,7 +205,7 @@ int main(){
 	//Create session with the server
 	int sockfd;
   struct sockaddr_in servaddr, cli;
-	char buff[MAX];
+	char buffer[MAX];
 	pthread_t events_thread;
 
 	//int done = 0;
@@ -209,9 +219,9 @@ int main(){
 	sockfd = create_socket( "127.0.0.1", PORT );
 	start_ui();
 
-	bzero(buff, MAX);
-	recv(sockfd, buff, sizeof(buff), 0);
-	sscanf(buff, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
+	memset(buffer, 0, MAX);
+	read(sockfd, buffer, sizeof(buffer));
+	sscanf(buffer, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
 	printf("first information (%d,%d,%d,%d)\n", color_0, color_1, color_2, dim);
 
 	/*bzero(buff, MAX);
@@ -229,7 +239,7 @@ int main(){
 
 	pthread_create(&events_thread, NULL, manage_sdlEvents, (void*)&sockfd);
 
-	//play(sockfd);
+	play(sockfd);
 	//paint_card(aux_x, aux_y, color_r, color_g, color_b);
 	//write_card(aux_x, aux_y, xx, color_r, color_g, color_b);
 
