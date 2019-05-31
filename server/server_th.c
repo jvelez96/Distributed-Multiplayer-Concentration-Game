@@ -31,12 +31,13 @@ void * broadcast_play(void *args){
   strcpy(buffer, ((struct args*)args)->buff);
 
   printf("sending buffer: %s\nto %d\n", buffer,socket);
-  write(socket, (char*) buffer, sizeof(buffer));
+  send(socket, (char*) buffer, sizeof(buffer),0);
   pthread_exit(NULL);
 }
 
 
 void * read_secondplay_buffer(void *socket){
+  int n;
   int newSocket = *((int*)socket);
   int x,y;
   fd_set rfds;
@@ -62,7 +63,13 @@ void * read_secondplay_buffer(void *socket){
   else if (retval){
      printf("Data is available now.\n");
      /* FD_ISSET(socket, &rfds) will be true. */
-     read(newSocket, buffer, sizeof(buffer));
+     n=recv(newSocket, buffer, sizeof(buffer),0);
+     if(n<0 || n==EOF){
+       //remove_player()
+       close(newSocket);
+       exit(-1);
+       pthread_exit(NULL);
+     }
      printf("2nd play buffer:\n%s\n", buffer);
 
      if(strcmp(buffer, "exit")== 0){
@@ -269,7 +276,7 @@ void send_board(){
       while(curr != NULL){
         //only sends board if the player has not received it yet
         if(curr->status == 0){
-          write(curr->socket, buffer, sizeof(buffer));
+          send(curr->socket, buffer, sizeof(buffer),0);
           printf("sending buffer %s for cell x: %d y: %d of board i: %d\n",buffer, x,y,i);
         }
         curr = curr->next;
@@ -326,7 +333,13 @@ void * first_play_thread(void *socket)
 
   while(!done){
     memset(buffer, 0, BUFFERSIZE);
-    read(newSocket, buffer, sizeof(buffer));
+    n=recv(newSocket, buffer, sizeof(buffer),0);
+    if(n<0 || n==EOF){
+      //remove_player()
+      close(newSocket);
+      exit(-1);
+      pthread_exit(NULL);
+    }
     printf("first play received %s\n", buffer);
 
     manage_player(buffer, newSocket, &done, player_info);
