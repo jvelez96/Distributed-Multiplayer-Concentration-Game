@@ -167,7 +167,7 @@ PlayerList* getNextNodeLinkedList(PlayerList* node);
 PlayerList *insertLastLinkedList(PlayerList * head, int socket, int player_id ,int *colors, int status);
 
 PlayerList *get_last_player(PlayerList *head);
-PlayerList *remove_player(PlayerList *head, int player_id);
+
 
 /* End of: Protect multiple inclusions                              */
 #endif

@@ -213,19 +213,19 @@ PlayerList *remove_player(PlayerList *head, int player_id){
 
   while(curr != NULL){
     if(player_id == curr->player_id){
-        if(curr == head){
-          head = head->next;
-          free(curr);
-          return head;
-        }else{
-          aux = head;
-          while(aux->next != curr){
-            aux = aux->next;
-          }
-          aux->next = curr->next;
-          free(curr);
+      if(curr == head){
+        head = head->next;
+        free(curr);
+        return head;
+      }else{
+        aux = head;
+        while(aux->next->player_id != player_id || aux->next != NULL){
+          aux = aux->next;
         }
-    }//found player
+        aux->next = curr->next;
+        free(curr);
+      }
+    }
     curr = curr->next;
   }
   return head;
