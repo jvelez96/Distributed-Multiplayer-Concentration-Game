@@ -80,7 +80,7 @@ void * read_secondplay_buffer(void *socket){
        pthread_exit(NULL);
      } else{
        sscanf(buffer, "%d %d", &x, &y);
-       pthread_mutex_lock(&lock[x][y]);
+       //pthread_mutex_lock(&lock[x][y]);
        resp[newSocket] = board_play(x, y, newSocket, OKAY);
        printf("2nd play code: %d\n", resp[newSocket].code);
 
@@ -88,8 +88,8 @@ void * read_secondplay_buffer(void *socket){
           unlock mutex if code=0
        */
 
-       if(resp[newSocket].code==0)
-          pthread_mutex_unlock(&lock[x][y]);
+       //if(resp[newSocket].code==0)
+        //  pthread_mutex_unlock(&lock[x][y]);
 
      }
   }
@@ -144,20 +144,20 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
   sscanf(buffer, "%d %d", &x, &y);
   printf("1st play x:%d y:%d\n", x, y);
 
-  pthread_mutex_lock(&lock[x][y]);
+  //pthread_mutex_lock(&lock[x][y]);
   printf("passed mutex\n");
   resp[socket] = board_play(x,y,socket, OKAY);
   printf("play response:\ncode %d\n", resp[socket].code);
 
   if(resp[socket].code == 0){
     /* filled position */
-    pthread_mutex_unlock(&lock[x][y]);
+    //pthread_mutex_unlock(&lock[x][y]);
   }else if(resp[socket].code == 1){
     /* valid first play */
     //fill the position
     resp[socket].code = 0;
     printf("x and y %d %d\n", resp[socket].play1[0], resp[socket].play1[1]);
-    pthread_mutex_unlock(&lock[x][y]);
+    //pthread_mutex_unlock(&lock[x][y]);
 
 
     update_color(x,y, player->color);
@@ -231,7 +231,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         write_card(resp[socket].play2[0], resp[socket].play2[1], resp[socket].str_play2, 255, 0, 0);
 
         broadcast();
-        pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
+        //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
 
         sleep(2);
 
@@ -281,7 +281,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
         sprintf(broadcast_buf, "1 %d %d %s %d %d %d", resp[socket].play2[0], resp[socket].play2[1], resp[socket].str_play1, player->color[0], player->color[1], player->color[2]);
 
         broadcast();
-        pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
+        //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
       break;
       case 3:
         //broadcast play to all Players
@@ -290,7 +290,7 @@ void manage_player(char *buffer, int socket, int *done, PlayerList *player)
 
         broadcast();
         //
-        pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
+        //pthread_mutex_unlock(&lock[resp[socket].play2[0]][resp[socket].play2[1]]);
 
         player->points++;
 
