@@ -70,12 +70,12 @@ int main(int argc, char* argv[]){
   //Listen on the socket, with 40 max connection requests queued
 
   //Initializing mutex locks
-  /*
+
   lock = (pthread_mutex_t **)malloc (sizeof(pthread_mutex_t *) * size);
   for(j=0;j<size;j++){
     lock[j]= (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t *) * size);
   }
-  */
+  
 
   if(listen(serverSocket,50)==0)
     printf("Listening\n");
