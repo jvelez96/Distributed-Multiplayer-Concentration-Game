@@ -96,7 +96,6 @@ int main(int argc, char* argv[]){
     //so the main thread can entertain next request
     colors = get_colors();
 
-    printf("color:%d %d %d\n", colors[0], colors[1], colors[2]);
    nplayers++;
    client_list = insertLastLinkedList(client_list, newSocket, i, colors, 0);
    i++;
@@ -118,7 +117,6 @@ int main(int argc, char* argv[]){
     for(j=0; j<i;j++){
       pthread_join(tid[j],NULL);
     }
-    printf("acabou\n");
   }
   pthread_mutex_destroy(*lock);
   return 0;

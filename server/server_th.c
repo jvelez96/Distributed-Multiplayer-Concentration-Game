@@ -316,7 +316,6 @@ void send_board(){
         //only sends board if the player has not received it yet
         if(curr->status == 0){
           send(curr->socket, buffer, sizeof(buffer),0);
-          printf("sending buffer %s for cell x: %d y: %d of board i: %d\n",buffer, x,y,i);
         }
         curr = curr->next;
       }
