@@ -88,7 +88,7 @@ void get_board(int dim, int sockfd)
 		{
 
 				memset(buffer, 0, MAX);
-				n = read(sockfd, buffer, sizeof(buffer), 0);
+				n = read(sockfd, buffer, sizeof(buffer));
 				if (n == -1)
         {
             perror("error reading");
@@ -163,7 +163,7 @@ void *play(int sockfd)
 		//aux1[2] = '\0';
 		//sscanf(buff, "%d,%d,%d,%s", &code, &board_x, &board_y, aux);
 
-		if (read(sockfd, buffer, sizeof(buffer), 0)== -1)
+		if (read(sockfd, buffer, sizeof(buffer))== -1)
 		{
 				perror("error receiving response");
 				exit(-1);
@@ -189,7 +189,7 @@ void *play(int sockfd)
 					paint_card(playX, playY, color[0], color[1], color[2]);
 					write_card(playX, playY, str_place, 200, 200, 200);
 					memset(buffer, 0, MAX);
-					read(sockfd, buffer, sizeof(buffer), 0);
+					read(sockfd, buffer, sizeof(buffer));
 					printf("%s", buffer);
 		      break;
 		}
@@ -220,7 +220,7 @@ int main(){
 	start_ui();
 
 	memset(buffer, 0, MAX);
-	read(sockfd, buffer, sizeof(buffer), 0);
+	read(sockfd, buffer, sizeof(buffer));
 	sscanf(buffer, "%d %d %d %d", &color_0, &color_1, &color_2, &dim);
 	printf("first information (%d,%d,%d,%d)\n", color_0, color_1, color_2, dim);
 
