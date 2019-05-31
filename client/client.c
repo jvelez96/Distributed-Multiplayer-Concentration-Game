@@ -186,13 +186,13 @@ void *play(int sockfd)
 				case 1:
 					sscanf(buffer,"1 %d %d %s %d %d %d", &playX, &playY, str_place, &color[0], &color[1], &color[2]);
 					paint_card(playX, playY , color[0], color[1], color[2]);
-					write_card(playX, playY , str_place, 200, 200, 200);
+					write_card(playX, playY , str_place, 255, 255, 255);
 		      break;
 
 				case 2:
 					sscanf(buffer,"1 %d %d %s %d %d %d", &playX, &playY, str_place, &color[0], &color[1], &color[2]);
 					paint_card(playX, playY, color[0], color[1], color[2]);
-					write_card(playX, playY, str_place, 200, 200, 200);
+					write_card(playX, playY, str_place, 255, 255, 255);
 					memset(buffer, 0, MAX);
 					n2 = recv(sockfd, buffer, sizeof(buffer),0);
 					if (n < 0 || n ==EOF)
