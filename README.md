@@ -5,3 +5,4 @@ Distributed multiplayer concentration game with a multi-thread client-server arc
 # Technologies & Programming Languages
 - C
 - TCP & UDP Protocols
+- Multi-thread
